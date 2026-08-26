@@ -19,7 +19,7 @@
                 <h1 class="text-xl font-bold">Form Pencatatan Listrik & Air</h1>
                 <p class="text-blue-100 text-xs">Utility Check System</p>
             </div>
-            <button id="btnOpenManageModal" class="bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-2 rounded-lg font-medium border border-blue-400 transition shadow">
+            <button id="btnOpenManageModal" type="button" class="bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-2 rounded-lg font-medium border border-blue-400 transition shadow">
                 ⚙️ Kelola Master Tenant
             </button>
         </div>
@@ -27,43 +27,44 @@
 
     <main class="max-w-xl mx-auto mt-6 px-4">
         <form id="utilityForm" class="bg-white rounded-lg shadow-md p-6 space-y-5">
-            <!-- Informasi Tenant -->
+            
+            <!-- Informasi Tenant & Lokasi -->
             <div class="border-b pb-4">
                 <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    Informasi Tenant & Lokasi
+                    Pilih Tenant / Lokasi
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- 1. Pencarian Custom Dropdown -->
+
+                <!-- UI Model Filter Box sesuai gambar -->
+                <div class="space-y-3">
+                    <!-- Input Search Filter -->
                     <div class="relative">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">1. Nama Tenant <span class="text-red-500">*</span></label>
-                        <input type="text" id="tenantSearchInput" autocomplete="off" required placeholder="Memuat tenant..." disabled
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:bg-gray-100">
-                        
-                        <!-- Box List Dropdown Hasil Pencarian -->
-                        <div id="dropdownList" class="absolute z-30 left-0 right-0 top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto hidden">
-                            <!-- Diisi via JavaScript -->
-                        </div>
-                        <input type="hidden" id="namaTenant">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                            🔍
+                        </span>
+                        <input type="text" id="tenantSearchInput" autocomplete="off" placeholder="Ketik nama tenant / No Lot..."
+                               class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm">
                     </div>
 
-                    <!-- 2. Select No Lot -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">2. No Lot / Lokasi <span class="text-red-500">*</span></label>
-                        <select id="noLotSelect" disabled required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50">
-                            <option value="">-- Pilih Tenant Dulu --</option>
-                        </select>
-                        <input type="hidden" id="noLot">
+                    <!-- Scrollable List Box Option -->
+                    <div class="border border-gray-300 rounded-lg max-h-56 overflow-y-auto bg-white divide-y divide-gray-100" id="tenantListBox">
+                        <div class="p-3 text-center text-xs text-gray-400">Memuat daftar tenant...</div>
                     </div>
+                </div>
 
+                <!-- Hidden Input Hasil Choice -->
+                <input type="hidden" id="namaTenant" required>
+                <input type="hidden" id="noLot" required>
+
+                <!-- Detail Read-only dari Tenant Terpilih -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN)</label>
-                        <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
+                        <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium text-gray-700">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area</label>
-                        <input type="text" id="zona" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
+                        <input type="text" id="zona" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium text-gray-700">
                     </div>
                 </div>
             </div>
@@ -136,7 +137,7 @@
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="font-bold text-gray-800 text-lg">Kelola Master Data Tenant</h3>
-                <button id="btnCloseManageModal" class="text-gray-500 hover:text-red-600 font-bold text-xl">&times;</button>
+                <button id="btnCloseManageModal" type="button" class="text-gray-500 hover:text-red-600 font-bold text-xl">&times;</button>
             </div>
 
             <form id="addTenantForm" class="mt-4 border-b pb-4 space-y-3">
@@ -165,7 +166,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
 
         let masterTenants = [];
-        let uniqueNames = [];
+        let selectedTenantObj = null;
         let padTeknisi, padTenant;
         let fotoBase64 = '';
 
@@ -177,19 +178,12 @@
         }
 
         async function fetchMasterTenant() {
-            const searchInput = document.getElementById('tenantSearchInput');
             const listContainer = document.getElementById('tenantListContainer');
-            
             try {
                 const res = await fetch(SCRIPT_URL);
                 masterTenants = await res.json();
 
                 listContainer.innerHTML = '';
-
-                // Kumpulkan nama unik
-                uniqueNames = [...new Set(masterTenants.map(t => t.nama.trim()))].sort();
-
-                // Populate List di Modal Kelola
                 masterTenants.forEach((t) => {
                     const rowDiv = document.createElement('div');
                     rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
@@ -203,17 +197,70 @@
                     listContainer.appendChild(rowDiv);
                 });
 
-                searchInput.placeholder = "Ketik/Pilih Nama Tenant...";
-                searchInput.disabled = false;
+                renderTenantList('');
             } catch (err) {
                 console.error(err);
-                searchInput.placeholder = "Gagal memuat data master";
+                document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal mengambil data master!</div>`;
             }
+        }
+
+        function renderTenantList(filterKeyword = '') {
+            const box = document.getElementById('tenantListBox');
+            box.innerHTML = '';
+
+            const filtered = masterTenants.filter(t => {
+                const searchStr = `${t.nama} ${t.lokasi} ${t.zona}`.toLowerCase();
+                return searchStr.includes(filterKeyword.toLowerCase());
+            });
+
+            if (filtered.length === 0) {
+                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lokasi yang sesuai</div>`;
+                return;
+            }
+
+            filtered.forEach((t) => {
+                const isSelected = selectedTenantObj && selectedTenantObj.nama === t.nama && selectedTenantObj.lokasi === t.lokasi;
+                const row = document.createElement('div');
+                row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
+                
+                row.innerHTML = `
+                    <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 pointer-events-none" ${isSelected ? 'checked' : ''}>
+                    <div class="text-sm">
+                        <span class="font-bold text-gray-800">${t.nama}</span>
+                        <span class="text-gray-500 font-medium"> - ${t.lokasi}</span>
+                        <span class="text-xs text-gray-400 font-normal"> [${t.zona}]</span>
+                    </div>
+                `;
+
+                row.onclick = () => selectTenantItem(t);
+                box.appendChild(row);
+            });
+        }
+
+        function selectTenantItem(t) {
+            selectedTenantObj = t;
+            
+            document.getElementById('namaTenant').value = t.nama;
+            document.getElementById('noLot').value = t.lokasi;
+            document.getElementById('zona').value = t.zona;
+
+            const snInput = document.getElementById('serialNumber');
+            if (t.sn) {
+                snInput.value = t.sn;
+                snInput.readOnly = true;
+                snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium text-gray-700";
+            } else {
+                snInput.value = '';
+                snInput.readOnly = false;
+                snInput.placeholder = "Ketik Serial Number Baru...";
+                snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
+            }
+
+            renderTenantList(document.getElementById('tenantSearchInput').value);
         }
 
         async function deleteTenant(nama, lokasi) {
             if (!confirm(`Yakin ingin menghapus tenant "${nama}" (${lokasi})?`)) return;
-
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -231,108 +278,11 @@
         window.addEventListener('DOMContentLoaded', () => {
             fetchMasterTenant();
 
-            const searchInput = document.getElementById('tenantSearchInput');
-            const dropdownList = document.getElementById('dropdownList');
-            const noLotSelect = document.getElementById('noLotSelect');
-            const snInput = document.getElementById('serialNumber');
-            const zonaInput = document.getElementById('zona');
-            const hiddenNama = document.getElementById('namaTenant');
-            const hiddenLot = document.getElementById('noLot');
-
-            // Render opsi ke custom dropdown
-            function renderDropdown(filterText = '') {
-                dropdownList.innerHTML = '';
-                const filtered = uniqueNames.filter(name => name.toLowerCase().includes(filterText.toLowerCase()));
-
-                if (filtered.length === 0) {
-                    dropdownList.innerHTML = `<div class="p-2 text-xs text-gray-400">Tidak ditemukan</div>`;
-                } else {
-                    filtered.forEach(name => {
-                        const item = document.createElement('div');
-                        item.className = 'px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer border-b last:border-b-0';
-                        item.textContent = name;
-                        item.onclick = () => selectTenantName(name);
-                        dropdownList.appendChild(item);
-                    });
-                }
-                dropdownList.classList.remove('hidden');
-            }
-
-            // Fokus/Ketik pada input pencarian
-            searchInput.addEventListener('focus', () => renderDropdown(searchInput.value));
-            searchInput.addEventListener('input', (e) => renderDropdown(e.target.value));
-
-            // Sembunyikan dropdown jika klik di luar
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !dropdownList.contains(e.target)) {
-                    dropdownList.classList.add('hidden');
-                }
+            document.getElementById('tenantSearchInput').addEventListener('input', (e) => {
+                renderTenantList(e.target.value);
             });
 
-            // Pilih Tenant dari Dropdown Custom
-            function selectTenantName(name) {
-                searchInput.value = name;
-                hiddenNama.value = name;
-                dropdownList.classList.add('hidden');
-
-                const matchedTenants = masterTenants.filter(t => t.nama.trim().toLowerCase() === name.toLowerCase());
-
-                noLotSelect.innerHTML = '';
-                snInput.value = '';
-                zonaInput.value = '';
-                hiddenLot.value = '';
-
-                if (matchedTenants.length > 0) {
-                    noLotSelect.disabled = false;
-                    noLotSelect.classList.remove('bg-gray-50');
-
-                    if (matchedTenants.length === 1) {
-                        const opt = document.createElement('option');
-                        opt.value = matchedTenants[0].lokasi;
-                        opt.textContent = `${matchedTenants[0].lokasi} (${matchedTenants[0].zona})`;
-                        noLotSelect.appendChild(opt);
-                        selectLocation(matchedTenants[0]);
-                    } else {
-                        const defaultOpt = document.createElement('option');
-                        defaultOpt.value = "";
-                        defaultOpt.textContent = `-- Pilih Salah Satu Lot (${matchedTenants.length} Tersedia) --`;
-                        noLotSelect.appendChild(defaultOpt);
-
-                        matchedTenants.forEach(t => {
-                            const opt = document.createElement('option');
-                            opt.value = t.lokasi;
-                            opt.textContent = `${t.lokasi} (${t.zona})`;
-                            noLotSelect.appendChild(opt);
-                        });
-                    }
-                }
-            }
-
-            // Saat Lot Dipilih
-            noLotSelect.addEventListener('change', (e) => {
-                const selectedLot = e.target.value;
-                const tenantName = hiddenNama.value;
-                const selected = masterTenants.find(t => t.nama.trim().toLowerCase() === tenantName.toLowerCase() && t.lokasi === selectedLot);
-                if (selected) selectLocation(selected);
-            });
-
-            function selectLocation(tenantObj) {
-                hiddenLot.value = tenantObj.lokasi;
-                zonaInput.value = tenantObj.zona;
-
-                if (tenantObj.sn) {
-                    snInput.value = tenantObj.sn;
-                    snInput.readOnly = true;
-                    snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
-                } else {
-                    snInput.value = '';
-                    snInput.readOnly = false;
-                    snInput.placeholder = "Ketik Serial Number Baru...";
-                    snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
-                }
-            }
-
-            // Canvas & Signature Pad
+            // Canvas Init
             const canvasTeknisi = document.getElementById('teknisiCanvas');
             const canvasTenant = document.getElementById('tenantCanvas');
             resizeCanvas(canvasTeknisi);
@@ -369,7 +319,7 @@
             document.getElementById('btnOpenManageModal').onclick = () => modal.classList.remove('hidden');
             document.getElementById('btnCloseManageModal').onclick = () => modal.classList.add('hidden');
 
-            // Form Tambah Tenant
+            // Tambah Tenant Form
             document.getElementById('addTenantForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const submitBtn = document.getElementById('btnAddTenantSubmit');
@@ -403,11 +353,11 @@
             };
         });
 
-        // Form Submit Utilitas Utama
+        // Form Submit Utama
         document.getElementById('utilityForm').onsubmit = async function(e) {
             e.preventDefault();
             if (!document.getElementById('namaTenant').value || !document.getElementById('noLot').value) {
-                return alert('Pilih Nama Tenant dan No Lot yang valid!');
+                return alert('Pilih salah satu Tenant/Lokasi dari list!');
             }
             if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
             if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
@@ -440,6 +390,8 @@
                 });
                 alert('Data pencatatan berhasil dikirim!');
                 document.getElementById('utilityForm').reset();
+                selectedTenantObj = null;
+                renderTenantList('');
                 padTeknisi.clear();
                 padTenant.clear();
                 document.getElementById('btnHapusFoto').click();
