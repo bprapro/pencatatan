@@ -195,6 +195,12 @@
         let padTeknisi, padTenant;
         let fotoBase64 = '';
 
+        // Fungsi pembersih teks nomor urut (menghapus format angka seperti "1 - ", "2.", "3 -")
+        function cleanName(name) {
+            if (!name) return '';
+            return String(name).replace(/^\d+[\s\-\.\)]*/, '').trim();
+        }
+
         function resizeCanvas(canvas) {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
@@ -206,7 +212,13 @@
             const listContainer = document.getElementById('tenantListContainer');
             try {
                 const res = await fetch(SCRIPT_URL);
-                masterTenants = await res.json();
+                const rawData = await res.json();
+                
+                // Bersihkan penomoran dari master data
+                masterTenants = rawData.map(t => ({
+                    ...t,
+                    nama: cleanName(t.nama)
+                }));
 
                 listContainer.innerHTML = '';
                 masterTenants.forEach((t) => {
@@ -214,8 +226,8 @@
                     rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
                     rowDiv.innerHTML = `
                         <div>
-                            <span class="font-bold text-gray-800">${t.nama}</span> - <span class="text-gray-600">${t.lokasi}</span>
-                            <span class="text-gray-400 block">SN: ${t.sn || '-'} | Zona: ${t.zona}</span>
+                            <span class="font-bold text-gray-800">${t.nama}</span> - <span class="text-gray-600">${t.lokasi || '-'}</span>
+                            <span class="text-gray-400 block">SN: ${t.sn || '-'} | Zona: ${t.zona || '-'}</span>
                         </div>
                         <button onclick="deleteTenant('${t.nama}', '${t.lokasi}')" class="bg-red-500 text-white px-2 py-1 rounded text-[10px] hover:bg-red-700">Hapus</button>
                     `;
@@ -241,12 +253,13 @@
                 }
 
                 historyList.forEach((item, index) => {
+                    const cleanNama = cleanName(item.namaTenant);
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50';
                     tr.innerHTML = `
                         <td class="p-2">
-                            <div class="font-bold text-gray-800">${item.namaTenant}</div>
-                            <div class="text-[10px] text-gray-500">${item.noLot}</div>
+                            <div class="font-bold text-gray-800">${cleanNama}</div>
+                            <div class="text-[10px] text-gray-500">${item.noLot || ''}</div>
                         </td>
                         <td class="p-2">${item.jenis}</td>
                         <td class="p-2 font-mono font-bold text-blue-600">${item.angka}</td>
@@ -272,12 +285,19 @@
             document.getElementById('namaTeknisi').value = item.namaTeknisi;
             document.getElementById('namaPenandatanganTenant').value = item.namaTenantPenandatangan;
 
-            const target = masterTenants.find(t => t.nama.trim().toLowerCase() === item.namaTenant.trim().toLowerCase() && t.lokasi === item.noLot);
+            const cName = cleanName(item.namaTenant).toLowerCase();
+            const target = masterTenants.find(t => cleanName(t.nama).toLowerCase() === cName || (t.lokasi && t.lokasi === item.noLot));
+            
             if (target) {
                 selectTenantItem(target);
+            } else {
+                document.getElementById('namaTenant').value = cleanName(item.namaTenant);
+                document.getElementById('noLot').value = item.noLot;
+                document.getElementById('serialNumber').value = item.sn;
+                document.getElementById('zona').value = item.zona;
             }
 
-            document.getElementById('submitBtn').innerText = ' Simpan Perubahan (Update)';
+            document.getElementById('submitBtn').innerText = 'Simpan Perubahan (Update)';
             document.getElementById('submitBtn').className = 'w-full py-3 bg-amber-600 text-white font-semibold rounded-lg shadow-md hover:bg-amber-700';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -295,34 +315,33 @@
         }
 
         function renderTenantList(filterKeyword = '') {
-    const box = document.getElementById('tenantListBox');
-    box.innerHTML = '';
+            const box = document.getElementById('tenantListBox');
+            box.innerHTML = '';
 
-    const filtered = masterTenants.filter(t => `${t.nama} ${t.lokasi} ${t.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
+            const filtered = masterTenants.filter(t => `${t.nama} ${t.lokasi} ${t.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
 
-    if (filtered.length === 0) {
-        box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lokasi yang sesuai</div>`;
-        return;
-    }
+            if (filtered.length === 0) {
+                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lokasi yang sesuai</div>`;
+                return;
+            }
 
-    filtered.forEach((t) => {
-        const isSelected = selectedTenantObj && selectedTenantObj.nama === t.nama && selectedTenantObj.lokasi === t.lokasi;
-        const row = document.createElement('div');
-        row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
-        
-        // Nomor dihapus, hanya menampilkan Nama, Lokasi, dan Zona
-        row.innerHTML = `
-            <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
-            <div class="text-sm">
-                <span class="font-bold text-gray-800">${t.nama}</span>
-                ${t.lokasi ? `<span class="text-gray-500 font-medium"> - ${t.lokasi}</span>` : ''}
-                ${t.zona ? `<span class="text-xs text-gray-400 font-normal"> [${t.zona}]</span>` : ''}
-            </div>
-        `;
-        row.onclick = () => selectTenantItem(t);
-        box.appendChild(row);
-    });
-}
+            filtered.forEach((t) => {
+                const isSelected = selectedTenantObj && selectedTenantObj.nama === t.nama && selectedTenantObj.lokasi === t.lokasi;
+                const row = document.createElement('div');
+                row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
+                
+                row.innerHTML = `
+                    <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
+                    <div class="text-sm">
+                        <span class="font-bold text-gray-800">${t.nama}</span>
+                        ${t.lokasi ? `<span class="text-gray-500 font-medium"> - ${t.lokasi}</span>` : ''}
+                        ${t.zona ? `<span class="text-xs text-gray-400 font-normal"> [${t.zona}]</span>` : ''}
+                    </div>
+                `;
+                row.onclick = () => selectTenantItem(t);
+                box.appendChild(row);
+            });
+        }
 
         function selectTenantItem(t) {
             selectedTenantObj = t;
@@ -334,11 +353,30 @@
             if (t.sn) {
                 snInput.value = t.sn;
                 snInput.readOnly = true;
+                snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium text-gray-700";
             } else {
                 snInput.value = '';
                 snInput.readOnly = false;
+                snInput.placeholder = "Ketik Serial Number...";
+                snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
             }
             renderTenantList(document.getElementById('tenantSearchInput').value);
+        }
+
+        async function deleteTenant(nama, lokasi) {
+            if (!confirm(`Yakin ingin menghapus tenant "${nama}" (${lokasi})?`)) return;
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "DELETE_TENANT", nama, lokasi })
+                });
+                alert('Permintaan hapus terkirim!');
+                setTimeout(fetchMasterTenant, 1500);
+            } catch (e) {
+                alert('Gagal menghapus: ' + e.message);
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -382,26 +420,56 @@
             const modal = document.getElementById('manageModal');
             document.getElementById('btnOpenManageModal').onclick = () => modal.classList.remove('hidden');
             document.getElementById('btnCloseManageModal').onclick = () => modal.classList.add('hidden');
+
+            document.getElementById('addTenantForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('btnAddTenantSubmit');
+                submitBtn.disabled = true;
+
+                const newPayload = {
+                    action: "ADD_TENANT",
+                    nama: cleanName(document.getElementById('newNama').value),
+                    lokasi: document.getElementById('newLokasi').value,
+                    sn: document.getElementById('newSN').value,
+                    zona: document.getElementById('newZona').value
+                };
+
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newPayload)
+                    });
+                    alert('Tenant berhasil ditambahkan!');
+                    document.getElementById('addTenantForm').reset();
+                    setTimeout(fetchMasterTenant, 1500);
+                } catch (err) {
+                    alert('Gagal menambah tenant: ' + err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            };
         });
 
         document.getElementById('utilityForm').onsubmit = async function(e) {
             e.preventDefault();
             const editingRowIndex = document.getElementById('editingRowIndex').value;
 
-            if (!document.getElementById('namaTenant').value || !document.getElementById('noLot').value) {
-                return alert('Pilih salah satu Tenant/Lokasi!');
+            if (!document.getElementById('namaTenant').value) {
+                return alert('Pilih salah satu Tenant/Lokasi dari daftar!');
             }
             if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
             if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Mengirim...';
+            submitBtn.innerText = 'Mengirim Data...';
 
             const payload = {
                 action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
                 rowIndex: editingRowIndex || null,
-                namaTenant: document.getElementById('namaTenant').value,
+                namaTenant: cleanName(document.getElementById('namaTenant').value),
                 noLot: document.getElementById('noLot').value,
                 serialNumber: document.getElementById('serialNumber').value,
                 zona: document.getElementById('zona').value,
@@ -421,10 +489,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                alert(editingRowIndex ? 'Data berhasil diubah!' : 'Data pencatatan berhasil dikirim!');
+                alert(editingRowIndex ? 'Data berhasil diperbarui!' : 'Data pencatatan berhasil dikirim!');
                 cancelEditMode();
                 padTeknisi.clear();
                 padTenant.clear();
+                document.getElementById('btnHapusFoto').click();
                 setTimeout(fetchHistory, 1500);
             } catch (err) {
                 alert('Gagal mengirim data: ' + err.message);
