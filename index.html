@@ -34,20 +34,24 @@
                     Informasi Tenant & Lokasi
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Cari Tenant / Lokasi <span class="text-red-500">*</span></label>
-                        <input type="text" id="tenantSearchInput" list="tenantListOptions" required placeholder="Memuat data tenant..." disabled
+                    <!-- Dropdown 1: Cari Nama Tenant Unik -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">1. Nama Tenant <span class="text-red-500">*</span></label>
+                        <input type="text" id="tenantSearchInput" list="tenantListOptions" required placeholder="Memuat tenant..." disabled
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:bg-gray-100">
                         <datalist id="tenantListOptions"></datalist>
+                        <input type="hidden" id="namaTenant">
                     </div>
+
+                    <!-- Dropdown 2: Pilih Lokasi/Lot dari Tenant Terpilih -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Nama Tenant</label>
-                        <input type="text" id="namaTenant" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">2. No Lot / Lokasi <span class="text-red-500">*</span></label>
+                        <select id="noLotSelect" disabled required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50">
+                            <option value="">-- Pilih Tenant Dulu --</option>
+                        </select>
+                        <input type="hidden" id="noLot">
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">No Lot / Lokasi</label>
-                        <input type="text" id="noLot" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
-                    </div>
+
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN)</label>
                         <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
@@ -130,7 +134,6 @@
                 <button id="btnCloseManageModal" class="text-gray-500 hover:text-red-600 font-bold text-xl">&times;</button>
             </div>
 
-            <!-- Form Tambah Tenant Baru -->
             <form id="addTenantForm" class="mt-4 border-b pb-4 space-y-3">
                 <h4 class="text-sm font-semibold text-blue-600">+ Tambah Tenant Baru</h4>
                 <div class="grid grid-cols-2 gap-2">
@@ -144,7 +147,6 @@
                 </button>
             </form>
 
-            <!-- Daftar Tenant saat ini untuk dihapus -->
             <div class="mt-4">
                 <h4 class="text-sm font-semibold text-gray-700 mb-2">Daftar Tenant (Hapus Data)</h4>
                 <div id="tenantListContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -180,13 +182,16 @@
                 dataList.innerHTML = '';
                 listContainer.innerHTML = '';
 
-                masterTenants.forEach((t) => {
-                    // Populate Autocomplete
+                // Ambil daftar Nama Tenant unik saja untuk pencarian
+                const uniqueNames = [...new Set(masterTenants.map(t => t.nama.trim()))].sort();
+                uniqueNames.forEach(nama => {
                     const opt = document.createElement('option');
-                    opt.value = `${t.nama} - ${t.lokasi} (${t.zona})`;
+                    opt.value = nama;
                     dataList.appendChild(opt);
+                });
 
-                    // Populate List di Modal Kelola
+                // Populate List Modal
+                masterTenants.forEach((t) => {
                     const rowDiv = document.createElement('div');
                     rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
                     rowDiv.innerHTML = `
@@ -199,7 +204,7 @@
                     listContainer.appendChild(rowDiv);
                 });
 
-                searchInput.placeholder = "Ketik nama tenant / lokasi...";
+                searchInput.placeholder = "Ketik/Pilih Nama Tenant...";
                 searchInput.disabled = false;
             } catch (err) {
                 console.error(err);
@@ -227,38 +232,91 @@
         window.addEventListener('DOMContentLoaded', () => {
             fetchMasterTenant();
 
-            // Search input logic
             const searchInput = document.getElementById('tenantSearchInput');
+            const noLotSelect = document.getElementById('noLotSelect');
             const snInput = document.getElementById('serialNumber');
+            const zonaInput = document.getElementById('zona');
+            const hiddenNama = document.getElementById('namaTenant');
+            const hiddenLot = document.getElementById('noLot');
 
+            // 1. EVENT: Saat Nama Tenant Dipilih
             searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.trim();
-                const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
+                const typedName = e.target.value.trim();
+                const matchedTenants = masterTenants.filter(t => t.nama.trim().toLowerCase() === typedName.toLowerCase());
 
-                if (selected) {
-                    document.getElementById('namaTenant').value = selected.nama;
-                    document.getElementById('noLot').value = selected.lokasi;
-                    document.getElementById('zona').value = selected.zona;
+                noLotSelect.innerHTML = '';
+                snInput.value = '';
+                zonaInput.value = '';
+                hiddenNama.value = '';
+                hiddenLot.value = '';
 
-                    if (selected.sn) {
-                        snInput.value = selected.sn;
-                        snInput.readOnly = true;
-                        snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+                if (matchedTenants.length > 0) {
+                    hiddenNama.value = matchedTenants[0].nama;
+                    noLotSelect.disabled = false;
+                    noLotSelect.classList.remove('bg-gray-50');
+
+                    if (matchedTenants.length === 1) {
+                        // Jika cuma punya 1 lokasi
+                        const opt = document.createElement('option');
+                        opt.value = matchedTenants[0].lokasi;
+                        opt.textContent = `${matchedTenants[0].lokasi} (${matchedTenants[0].zona})`;
+                        noLotSelect.appendChild(opt);
+                        
+                        // Auto trigger select
+                        selectLocation(matchedTenants[0]);
                     } else {
-                        snInput.value = '';
-                        snInput.readOnly = false;
-                        snInput.placeholder = "Ketik Serial Number Baru...";
-                        snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
+                        // Jika punya lebih dari 1 lokasi (seperti AZKO)
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = "";
+                        defaultOpt.textContent = `-- Pilih Salah Satu Lot (${matchedTenants.length} Tersedia) --`;
+                        noLotSelect.appendChild(defaultOpt);
+
+                        matchedTenants.forEach(t => {
+                            const opt = document.createElement('option');
+                            opt.value = t.lokasi;
+                            opt.textContent = `${t.lokasi} (${t.zona})`;
+                            noLotSelect.appendChild(opt);
+                        });
                     }
                 } else {
-                    document.getElementById('namaTenant').value = '';
-                    document.getElementById('noLot').value = '';
-                    document.getElementById('serialNumber').value = '';
-                    document.getElementById('zona').value = '';
-                    snInput.readOnly = true;
-                    snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+                    noLotSelect.disabled = true;
+                    noLotSelect.classList.add('bg-gray-50');
+                    noLotSelect.innerHTML = '<option value="">-- Pilih Tenant Dulu --</option>';
+                    resetSNField();
                 }
             });
+
+            // 2. EVENT: Saat No Lot Dipilih dari Dropdown
+            noLotSelect.addEventListener('change', (e) => {
+                const selectedLot = e.target.value;
+                const tenantName = hiddenNama.value;
+                
+                const selected = masterTenants.find(t => t.nama.trim().toLowerCase() === tenantName.toLowerCase() && t.lokasi === selectedLot);
+                if (selected) {
+                    selectLocation(selected);
+                }
+            });
+
+            function selectLocation(tenantObj) {
+                hiddenLot.value = tenantObj.lokasi;
+                zonaInput.value = tenantObj.zona;
+
+                if (tenantObj.sn) {
+                    snInput.value = tenantObj.sn;
+                    snInput.readOnly = true;
+                    snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+                } else {
+                    snInput.value = '';
+                    snInput.readOnly = false;
+                    snInput.placeholder = "Ketik Serial Number Baru...";
+                    snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
+                }
+            }
+
+            function resetSNField() {
+                snInput.readOnly = true;
+                snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+            }
 
             // Signature Pads
             const canvasTeknisi = document.getElementById('teknisiCanvas');
@@ -334,7 +392,9 @@
         // Form Submit Utilitas Utama
         document.getElementById('utilityForm').onsubmit = async function(e) {
             e.preventDefault();
-            if (!document.getElementById('namaTenant').value) return alert('Pilih tenant dari daftar!');
+            if (!document.getElementById('namaTenant').value || !document.getElementById('noLot').value) {
+                return alert('Pilih Nama Tenant dan No Lot yang valid!');
+            }
             if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
             if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
             if (!fotoBase64) return alert('Foto wajib diupload!');
