@@ -46,12 +46,14 @@
                     Informasi Tenant & Lokasi
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Dropdown / Search Tenant -->
+                    <!-- Search Input Tenant dengan Datalist Auto-Complete -->
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Pilih Tenant / Lokasi <span class="text-red-500">*</span></label>
-                        <select id="tenantSelect" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
-                            <option value="">-- Pilih Tenant --</option>
-                        </select>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Cari Tenant / Lokasi <span class="text-red-500">*</span></label>
+                        <input type="text" id="tenantSearchInput" list="tenantListOptions" required placeholder="Ketik nama tenant / lokasi (cth: SOLARIA)..."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                        <datalist id="tenantListOptions">
+                            <!-- Pilihan rekomendasi diisi otomatis oleh JavaScript -->
+                        </datalist>
                     </div>
 
                     <div>
@@ -155,8 +157,7 @@
     </main>
 
     <script>
-        // MASTER DATA TENANT (Diambil dari Spreadsheet Anda)
-        // Anda bisa menambah/mengedit daftarnya di dalam array ini
+        // MASTER DATA TENANT
         const masterTenants = [
             { nama: "GUARDIAN", lokasi: "PB-FNB-L3-40", sn: "250916528", zona: "L3-A" },
             { nama: "GUARDIAN", lokasi: "PB-FNB-L3-41A", sn: "", zona: "L3-A" },
@@ -199,20 +200,23 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Populate Dropdown Tenant
-            const selectEl = document.getElementById('tenantSelect');
-            masterTenants.forEach((t, index) => {
+            const searchInput = document.getElementById('tenantSearchInput');
+            const dataList = document.getElementById('tenantListOptions');
+
+            // Populate Datalist dengan opsi gabungan Nama + Lokasi
+            masterTenants.forEach((t) => {
                 const opt = document.createElement('option');
-                opt.value = index;
-                opt.textContent = `${t.nama} - ${t.lokasi} (${t.zona})`;
-                selectEl.appendChild(opt);
+                const labelFull = `${t.nama} - ${t.lokasi} (${t.zona})`;
+                opt.value = labelFull;
+                dataList.appendChild(opt);
             });
 
-            // Auto-fill form saat tenant dipilih
-            selectEl.addEventListener('change', (e) => {
-                const idx = e.target.value;
-                if (idx !== "") {
-                    const selected = masterTenants[idx];
+            // Event saat pengguna mengetik/memilih dari rekomendasi
+            searchInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
+                
+                if (selected) {
                     document.getElementById('namaTenant').value = selected.nama;
                     document.getElementById('noLot').value = selected.lokasi;
                     document.getElementById('serialNumber').value = selected.sn;
@@ -269,6 +273,11 @@
             e.preventDefault();
 
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbxo4E63rCCM2HBqEzSZpyqKmgSRor0z_S8CLBH5FNWypR_jZLxEaGSlvEROiZlI_OZHYg/exec';
+
+            if (!document.getElementById('namaTenant').value) {
+                alert('Pilih tenant dari daftar rekomendasi yang tersedia!');
+                return;
+            }
 
             if (padTeknisi.isEmpty()) {
                 alert('Tanda tangan teknisi wajib diisi!');
