@@ -295,32 +295,34 @@
         }
 
         function renderTenantList(filterKeyword = '') {
-            const box = document.getElementById('tenantListBox');
-            box.innerHTML = '';
+    const box = document.getElementById('tenantListBox');
+    box.innerHTML = '';
 
-            const filtered = masterTenants.filter(t => `${t.nama} ${t.lokasi} ${t.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
+    const filtered = masterTenants.filter(t => `${t.nama} ${t.lokasi} ${t.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
 
-            if (filtered.length === 0) {
-                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lokasi yang sesuai</div>`;
-                return;
-            }
+    if (filtered.length === 0) {
+        box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lokasi yang sesuai</div>`;
+        return;
+    }
 
-            filtered.forEach((t) => {
-                const isSelected = selectedTenantObj && selectedTenantObj.nama === t.nama && selectedTenantObj.lokasi === t.lokasi;
-                const row = document.createElement('div');
-                row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
-                row.innerHTML = `
-                    <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
-                    <div class="text-sm">
-                        <span class="font-bold text-gray-800">${t.nama}</span>
-                        <span class="text-gray-500 font-medium"> - ${t.lokasi}</span>
-                        <span class="text-xs text-gray-400 font-normal"> [${t.zona}]</span>
-                    </div>
-                `;
-                row.onclick = () => selectTenantItem(t);
-                box.appendChild(row);
-            });
-        }
+    filtered.forEach((t) => {
+        const isSelected = selectedTenantObj && selectedTenantObj.nama === t.nama && selectedTenantObj.lokasi === t.lokasi;
+        const row = document.createElement('div');
+        row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
+        
+        // Nomor dihapus, hanya menampilkan Nama, Lokasi, dan Zona
+        row.innerHTML = `
+            <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
+            <div class="text-sm">
+                <span class="font-bold text-gray-800">${t.nama}</span>
+                ${t.lokasi ? `<span class="text-gray-500 font-medium"> - ${t.lokasi}</span>` : ''}
+                ${t.zona ? `<span class="text-xs text-gray-400 font-normal"> [${t.zona}]</span>` : ''}
+            </div>
+        `;
+        row.onclick = () => selectTenantItem(t);
+        box.appendChild(row);
+    });
+}
 
         function selectTenantItem(t) {
             selectedTenantObj = t;
