@@ -195,23 +195,44 @@
                 searchInput.disabled = false;
             }
 
-            // 2. Event listener pencarian tenant
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.trim();
-                const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
-                
-                if (selected) {
-                    document.getElementById('namaTenant').value = selected.nama;
-                    document.getElementById('noLot').value = selected.lokasi;
-                    document.getElementById('serialNumber').value = selected.sn || '';
-                    document.getElementById('zona').value = selected.zona;
-                } else {
-                    document.getElementById('namaTenant').value = '';
-                    document.getElementById('noLot').value = '';
-                    document.getElementById('serialNumber').value = '';
-                    document.getElementById('zona').value = '';
-                }
-            });
+            // Event listener pencarian tenant
+searchInput.addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
+    
+    const snInput = document.getElementById('serialNumber');
+
+    if (selected) {
+        document.getElementById('namaTenant').value = selected.nama;
+        document.getElementById('noLot').value = selected.lokasi;
+        document.getElementById('zona').value = selected.zona;
+
+        // Logika Serial Number:
+        if (selected.sn) {
+            // Jika SN sudah ada di Master, buat Readonly & ubah warna background
+            snInput.value = selected.sn;
+            snInput.readOnly = true;
+            snInput.classList.add('bg-gray-50');
+            snInput.classList.remove('bg-yellow-50', 'border-yellow-400');
+            snInput.placeholder = "";
+        } else {
+            // Jika SN belum ada, izinkan teknisi mengisi manual!
+            snInput.value = '';
+            snInput.readOnly = false;
+            snInput.classList.remove('bg-gray-50');
+            snInput.classList.add('bg-yellow-50', 'border-yellow-400');
+            snInput.placeholder = "Ketik Serial Number Baru...";
+        }
+    } else {
+        document.getElementById('namaTenant').value = '';
+        document.getElementById('noLot').value = '';
+        document.getElementById('serialNumber').value = '';
+        document.getElementById('zona').value = '';
+        snInput.readOnly = true;
+        snInput.classList.remove('bg-yellow-50', 'border-yellow-400');
+        snInput.classList.add('bg-gray-50');
+    }
+});
 
             // 3. Setup Signature Pad
             const canvasTeknisi = document.getElementById('teknisiCanvas');
