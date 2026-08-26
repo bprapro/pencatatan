@@ -4,78 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pencatatan Meteran Listrik & Air</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Signature Pad library -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <style>
-        .canvas-container {
-            position: relative;
-            width: 100%;
-            height: 160px;
-            background-color: #f9fafb;
-            border: 2px dashed #d1d5db;
-            border-radius: 0.5rem;
-            touch-action: none;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 0.5rem;
-        }
+        .canvas-container { position: relative; width: 100%; height: 160px; background-color: #f9fafb; border: 2px dashed #d1d5db; border-radius: 0.5rem; touch-action: none; }
+        canvas { width: 100%; height: 100%; border-radius: 0.5rem; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-12">
 
-    <!-- Header -->
     <header class="bg-blue-600 text-white shadow-md">
-        <div class="max-w-xl mx-auto px-4 py-5 text-center">
-            <h1 class="text-2xl font-bold">Form Pencatatan Listrik & Air</h1>
-            <p class="text-blue-100 text-sm mt-1">Form Digital Utility Check - Tenant Management</p>
+        <div class="max-w-xl mx-auto px-4 py-5 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold">Form Pencatatan Listrik & Air</h1>
+                <p class="text-blue-100 text-xs">Utility Check System</p>
+            </div>
+            <button id="btnOpenManageModal" class="bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-2 rounded-lg font-medium border border-blue-400 transition shadow">
+                ⚙️ Kelola Master Tenant
+            </button>
         </div>
     </header>
 
-    <!-- Main Container -->
     <main class="max-w-xl mx-auto mt-6 px-4">
         <form id="utilityForm" class="bg-white rounded-lg shadow-md p-6 space-y-5">
-            
-            <!-- Information Section -->
+            <!-- Informasi Tenant -->
             <div class="border-b pb-4">
                 <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path></svg>
                     Informasi Tenant & Lokasi
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Search Input Tenant -->
                     <div class="md:col-span-2">
                         <label class="block text-xs font-medium text-gray-700 mb-1">Cari Tenant / Lokasi <span class="text-red-500">*</span></label>
                         <input type="text" id="tenantSearchInput" list="tenantListOptions" required placeholder="Memuat data tenant..." disabled
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:bg-gray-100">
-                        <datalist id="tenantListOptions">
-                            <!-- Pilihan rekomendasi diisi otomatis oleh JavaScript -->
-                        </datalist>
+                        <datalist id="tenantListOptions"></datalist>
                     </div>
-
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Nama Tenant</label>
-                        <input type="text" id="namaTenant" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                        <input type="text" id="namaTenant" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">No Lot / Lokasi</label>
-                        <input type="text" id="noLot" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                        <input type="text" id="noLot" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN)</label>
-                        <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                        <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area</label>
-                        <input type="text" id="zona" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                        <input type="text" id="zona" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium">
                     </div>
                 </div>
             </div>
 
-            <!-- Reading Section -->
+            <!-- Pencatatan Meteran -->
             <div class="border-b pb-4">
                 <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -84,80 +68,93 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Pencatatan <span class="text-red-500">*</span></label>
-                        <select id="jenisPencatatan" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <select id="jenisPencatatan" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
                             <option value="Listrik">⚡ Listrik (kWh)</option>
                             <option value="Air">💧 Air (m³)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Angka Meteran (Hingga 4 desimal) <span class="text-red-500">*</span></label>
-                        <input type="number" id="angka" step="0.0001" min="0" required placeholder="0000.0000"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Angka Meteran <span class="text-red-500">*</span></label>
+                        <input type="number" id="angka" step="0.0001" min="0" required placeholder="0000.0000" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
                     </div>
                 </div>
 
-                <!-- Photo Input -->
                 <div class="mt-4">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Foto Dokumentasi Meteran <span class="text-red-500">*</span></label>
                     <input type="file" id="fotoInput" accept="image/*" capture="environment" class="hidden">
-                    <button type="button" id="btnAmbilFoto" 
-                            class="w-full py-2.5 px-4 border border-dashed border-gray-400 rounded-lg text-sm text-gray-600 flex items-center justify-center gap-2 hover:bg-gray-50 transition">
-                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3" stroke-width="2"></circle></svg>
-                        Ambil Foto Kamera / Pilih File
+                    <button type="button" id="btnAmbilFoto" class="w-full py-2.5 border border-dashed border-gray-400 rounded-lg text-sm text-gray-600 flex items-center justify-center gap-2 hover:bg-gray-50">
+                        📸 Ambil Foto Kamera / Pilih File
                     </button>
                     <div id="photoPreviewContainer" class="hidden mt-3 relative">
                         <img id="photoPreview" class="w-full h-48 object-cover rounded-lg border shadow-sm" alt="Preview">
-                        <button type="button" id="btnHapusFoto" class="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full shadow hover:bg-red-700">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
+                        <button type="button" id="btnHapusFoto" class="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full shadow">✕</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Signatures Section -->
+            <!-- TTD -->
             <div class="space-y-4">
                 <h2 class="text-base font-semibold text-gray-800 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     Tanda Tangan & Verifikasi
                 </h2>
-                
-                <!-- Teknisi Signature -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-medium text-gray-700">Tanda Tangan Teknisi <span class="text-red-500">*</span></label>
+                        <label class="text-xs font-medium text-gray-700">Tanda Tangan Teknisi *</label>
                         <button type="button" id="btnHapusPadTeknisi" class="text-xs text-red-600 hover:underline">Hapus TTD</button>
                     </div>
-                    <div class="canvas-container">
-                        <canvas id="teknisiCanvas"></canvas>
-                    </div>
-                    <input type="text" id="namaTeknisi" required placeholder="Nama Lengkap Teknisi"
-                           class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
+                    <div class="canvas-container"><canvas id="teknisiCanvas"></canvas></div>
+                    <input type="text" id="namaTeknisi" required placeholder="Nama Lengkap Teknisi" class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md text-xs">
                 </div>
-
-                <!-- Tenant Signature -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-medium text-gray-700">Tanda Tangan Tenant <span class="text-red-500">*</span></label>
+                        <label class="text-xs font-medium text-gray-700">Tanda Tangan Tenant *</label>
                         <button type="button" id="btnHapusPadTenant" class="text-xs text-red-600 hover:underline">Hapus TTD</button>
                     </div>
-                    <div class="canvas-container">
-                        <canvas id="tenantCanvas"></canvas>
-                    </div>
-                    <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Lengkap Penandatangan (Pihak Tenant)"
-                           class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
+                    <div class="canvas-container"><canvas id="tenantCanvas"></canvas></div>
+                    <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Lengkap Penandatangan (Tenant)" class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md text-xs">
                 </div>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit" id="submitBtn" 
-                    class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                <span>Kirim Data Pencatatan</span>
+            <button type="submit" id="submitBtn" class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">
+                Kirim Data Pencatatan
             </button>
         </form>
     </main>
 
+    <!-- MODAL KELOLA MASTER TENANT -->
+    <div id="manageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-gray-800 text-lg">Kelola Master Data Tenant</h3>
+                <button id="btnCloseManageModal" class="text-gray-500 hover:text-red-600 font-bold text-xl">&times;</button>
+            </div>
+
+            <!-- Form Tambah Tenant Baru -->
+            <form id="addTenantForm" class="mt-4 border-b pb-4 space-y-3">
+                <h4 class="text-sm font-semibold text-blue-600">+ Tambah Tenant Baru</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="newNama" required placeholder="Nama Tenant" class="px-2 py-1.5 border rounded text-xs">
+                    <input type="text" id="newLokasi" required placeholder="No Lot / Lokasi" class="px-2 py-1.5 border rounded text-xs">
+                    <input type="text" id="newSN" placeholder="Serial Number (Opsional)" class="px-2 py-1.5 border rounded text-xs">
+                    <input type="text" id="newZona" required placeholder="Zona (contoh: L3-A)" class="px-2 py-1.5 border rounded text-xs">
+                </div>
+                <button type="submit" id="btnAddTenantSubmit" class="w-full py-2 bg-green-600 text-white text-xs font-semibold rounded hover:bg-green-700">
+                    Simpan Tenant Baru
+                </button>
+            </form>
+
+            <!-- Daftar Tenant saat ini untuk dihapus -->
+            <div class="mt-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Daftar Tenant (Hapus Data)</h4>
+                <div id="tenantListContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-xs text-gray-400">Memuat data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // URL SCRIPT BARU ANDA
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
 
         let masterTenants = [];
@@ -171,132 +168,176 @@
             canvas.getContext("2d").scale(ratio, ratio);
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        async function fetchMasterTenant() {
             const searchInput = document.getElementById('tenantSearchInput');
             const dataList = document.getElementById('tenantListOptions');
-
-            // 1. Fetch data master tenant secara otomatis dari Google Sheets
+            const listContainer = document.getElementById('tenantListContainer');
+            
             try {
                 const res = await fetch(SCRIPT_URL);
                 masterTenants = await res.json();
 
                 dataList.innerHTML = '';
+                listContainer.innerHTML = '';
+
                 masterTenants.forEach((t) => {
+                    // Populate Autocomplete
                     const opt = document.createElement('option');
                     opt.value = `${t.nama} - ${t.lokasi} (${t.zona})`;
                     dataList.appendChild(opt);
+
+                    // Populate List di Modal Kelola
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
+                    rowDiv.innerHTML = `
+                        <div>
+                            <span class="font-bold text-gray-800">${t.nama}</span> - <span class="text-gray-600">${t.lokasi}</span>
+                            <span class="text-gray-400 block">SN: ${t.sn || '-'} | Zona: ${t.zona}</span>
+                        </div>
+                        <button onclick="deleteTenant('${t.nama}', '${t.lokasi}')" class="bg-red-500 text-white px-2 py-1 rounded text-[10px] hover:bg-red-700">Hapus</button>
+                    `;
+                    listContainer.appendChild(rowDiv);
                 });
 
                 searchInput.placeholder = "Ketik nama tenant / lokasi...";
                 searchInput.disabled = false;
             } catch (err) {
-                console.error("Gagal memuat master tenant:", err);
-                searchInput.placeholder = "Ketik manual (gagal memuat data)";
-                searchInput.disabled = false;
+                console.error(err);
+                searchInput.placeholder = "Gagal memuat data master";
             }
-
-            // Event listener pencarian tenant
-searchInput.addEventListener('input', (e) => {
-    const val = e.target.value.trim();
-    const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
-    
-    const snInput = document.getElementById('serialNumber');
-
-    if (selected) {
-        document.getElementById('namaTenant').value = selected.nama;
-        document.getElementById('noLot').value = selected.lokasi;
-        document.getElementById('zona').value = selected.zona;
-
-        // Logika Serial Number:
-        if (selected.sn) {
-            // Jika SN sudah ada di Master, buat Readonly & ubah warna background
-            snInput.value = selected.sn;
-            snInput.readOnly = true;
-            snInput.classList.add('bg-gray-50');
-            snInput.classList.remove('bg-yellow-50', 'border-yellow-400');
-            snInput.placeholder = "";
-        } else {
-            // Jika SN belum ada, izinkan teknisi mengisi manual!
-            snInput.value = '';
-            snInput.readOnly = false;
-            snInput.classList.remove('bg-gray-50');
-            snInput.classList.add('bg-yellow-50', 'border-yellow-400');
-            snInput.placeholder = "Ketik Serial Number Baru...";
         }
-    } else {
-        document.getElementById('namaTenant').value = '';
-        document.getElementById('noLot').value = '';
-        document.getElementById('serialNumber').value = '';
-        document.getElementById('zona').value = '';
-        snInput.readOnly = true;
-        snInput.classList.remove('bg-yellow-50', 'border-yellow-400');
-        snInput.classList.add('bg-gray-50');
-    }
-});
 
-            // 3. Setup Signature Pad
+        async function deleteTenant(nama, lokasi) {
+            if (!confirm(`Yakin ingin menghapus tenant "${nama}" (${lokasi})?`)) return;
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "DELETE_TENANT", nama, lokasi })
+                });
+                alert('Permintaan hapus terkirim!');
+                setTimeout(fetchMasterTenant, 1500);
+            } catch (e) {
+                alert('Gagal menghapus: ' + e.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchMasterTenant();
+
+            // Search input logic
+            const searchInput = document.getElementById('tenantSearchInput');
+            const snInput = document.getElementById('serialNumber');
+
+            searchInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                const selected = masterTenants.find(t => `${t.nama} - ${t.lokasi} (${t.zona})` === val);
+
+                if (selected) {
+                    document.getElementById('namaTenant').value = selected.nama;
+                    document.getElementById('noLot').value = selected.lokasi;
+                    document.getElementById('zona').value = selected.zona;
+
+                    if (selected.sn) {
+                        snInput.value = selected.sn;
+                        snInput.readOnly = true;
+                        snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+                    } else {
+                        snInput.value = '';
+                        snInput.readOnly = false;
+                        snInput.placeholder = "Ketik Serial Number Baru...";
+                        snInput.className = "w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md text-sm font-medium focus:ring-2 focus:ring-yellow-500";
+                    }
+                } else {
+                    document.getElementById('namaTenant').value = '';
+                    document.getElementById('noLot').value = '';
+                    document.getElementById('serialNumber').value = '';
+                    document.getElementById('zona').value = '';
+                    snInput.readOnly = true;
+                    snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
+                }
+            });
+
+            // Signature Pads
             const canvasTeknisi = document.getElementById('teknisiCanvas');
             const canvasTenant = document.getElementById('tenantCanvas');
-
             resizeCanvas(canvasTeknisi);
             resizeCanvas(canvasTenant);
 
             padTeknisi = new SignaturePad(canvasTeknisi, { backgroundColor: 'rgb(255, 255, 255)' });
             padTenant = new SignaturePad(canvasTenant, { backgroundColor: 'rgb(255, 255, 255)' });
 
-            document.getElementById('btnHapusPadTeknisi').addEventListener('click', () => padTeknisi.clear());
-            document.getElementById('btnHapusPadTenant').addEventListener('click', () => padTenant.clear());
-            
-            document.getElementById('btnAmbilFoto').addEventListener('click', () => {
-                document.getElementById('fotoInput').click();
-            });
+            document.getElementById('btnHapusPadTeknisi').onclick = () => padTeknisi.clear();
+            document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
 
-            document.getElementById('fotoInput').addEventListener('change', previewImage);
-            document.getElementById('btnHapusFoto').addEventListener('click', removePhoto);
+            // Photo handling
+            document.getElementById('btnAmbilFoto').onclick = () => document.getElementById('fotoInput').click();
+            document.getElementById('fotoInput').onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        fotoBase64 = evt.target.result;
+                        document.getElementById('photoPreview').src = fotoBase64;
+                        document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            document.getElementById('btnHapusFoto').onclick = () => {
+                fotoBase64 = '';
+                document.getElementById('fotoInput').value = '';
+                document.getElementById('photoPreviewContainer').classList.add('hidden');
+            };
+
+            // Modal Handlers
+            const modal = document.getElementById('manageModal');
+            document.getElementById('btnOpenManageModal').onclick = () => modal.classList.remove('hidden');
+            document.getElementById('btnCloseManageModal').onclick = () => modal.classList.add('hidden');
+
+            // Submit Form Tambah Tenant Baru
+            document.getElementById('addTenantForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('btnAddTenantSubmit');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Menyimpan...';
+
+                const newPayload = {
+                    action: "ADD_TENANT",
+                    nama: document.getElementById('newNama').value,
+                    lokasi: document.getElementById('newLokasi').value,
+                    sn: document.getElementById('newSN').value,
+                    zona: document.getElementById('newZona').value
+                };
+
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newPayload)
+                    });
+                    alert('Tenant berhasil ditambahkan!');
+                    document.getElementById('addTenantForm').reset();
+                    setTimeout(fetchMasterTenant, 1500);
+                } catch (err) {
+                    alert('Gagal menambah tenant: ' + err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Simpan Tenant Baru';
+                }
+            };
         });
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    fotoBase64 = e.target.result;
-                    document.getElementById('photoPreview').src = fotoBase64;
-                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function removePhoto() {
-            fotoBase64 = '';
-            document.getElementById('fotoInput').value = '';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-        }
-
-        // Form Submit Event
-        document.getElementById('utilityForm').addEventListener('submit', async function(e) {
+        // Form Submit Utilitas Utama
+        document.getElementById('utilityForm').onsubmit = async function(e) {
             e.preventDefault();
-
-            if (!document.getElementById('namaTenant').value) {
-                alert('Pilih tenant dari daftar rekomendasi yang tersedia!');
-                return;
-            }
-
-            if (padTeknisi.isEmpty()) {
-                alert('Tanda tangan teknisi wajib diisi!');
-                return;
-            }
-
-            if (padTenant.isEmpty()) {
-                alert('Tanda tangan tenant wajib diisi!');
-                return;
-            }
-
-            if (!fotoBase64) {
-                alert('Foto dokumentasi wajib diambil/diupload!');
-                return;
-            }
+            if (!document.getElementById('namaTenant').value) return alert('Pilih tenant dari daftar!');
+            if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
+            if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
+            if (!fotoBase64) return alert('Foto wajib diupload!');
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
@@ -323,20 +364,18 @@ searchInput.addEventListener('input', (e) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 alert('Data pencatatan berhasil dikirim!');
-                
                 document.getElementById('utilityForm').reset();
                 padTeknisi.clear();
                 padTenant.clear();
-                removePhoto();
+                document.getElementById('btnHapusFoto').click();
             } catch (err) {
                 alert('Gagal mengirim data: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span>Kirim Data Pencatatan</span>';
             }
-        });
+        };
     </script>
 </body>
 </html>
