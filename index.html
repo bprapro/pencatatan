@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pencatatan Meteran Listrik & Air</title>
-    <!-- Tailwind CSS (UI Styling) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Signature Pad library -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
@@ -37,7 +37,6 @@
 
     <!-- Main Container -->
     <main class="max-w-xl mx-auto mt-6 px-4">
-        
         <form id="utilityForm" class="bg-white rounded-lg shadow-md p-6 space-y-5">
             
             <!-- Information Section -->
@@ -47,20 +46,29 @@
                     Informasi Tenant & Lokasi
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Nama Tenant <span class="text-red-500">*</span></label>
-                        <input type="text" id="namaTenant" required placeholder="Contoh: Toko Kopi Sejahtera"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">No Lot <span class="text-red-500">*</span></label>
-                        <input type="text" id="noLot" required placeholder="Contoh: L1-05"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    </div>
+                    <!-- Dropdown / Search Tenant -->
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area <span class="text-red-500">*</span></label>
-                        <input type="text" id="zona" required placeholder="Contoh: GF - Main Mall / Foodcourt"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Pilih Tenant / Lokasi <span class="text-red-500">*</span></label>
+                        <select id="tenantSelect" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                            <option value="">-- Pilih Tenant --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Nama Tenant</label>
+                        <input type="text" id="namaTenant" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">No Lot / Lokasi</label>
+                        <input type="text" id="noLot" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN)</label>
+                        <input type="text" id="serialNumber" readonly class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area</label>
+                        <input type="text" id="zona" readonly required class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm text-gray-700 font-medium">
                     </div>
                 </div>
             </div>
@@ -86,7 +94,7 @@
                     </div>
                 </div>
 
-                <!-- Camera / Photo Input -->
+                <!-- Photo Input -->
                 <div class="mt-4">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Foto Dokumentasi Meteran <span class="text-red-500">*</span></label>
                     <input type="file" id="fotoInput" accept="image/*" capture="environment" class="hidden">
@@ -147,6 +155,39 @@
     </main>
 
     <script>
+        // MASTER DATA TENANT (Diambil dari Spreadsheet Anda)
+        // Anda bisa menambah/mengedit daftarnya di dalam array ini
+        const masterTenants = [
+            { nama: "GUARDIAN", lokasi: "PB-FNB-L3-40", sn: "250916528", zona: "L3-A" },
+            { nama: "GUARDIAN", lokasi: "PB-FNB-L3-41A", sn: "", zona: "L3-A" },
+            { nama: "IMPERIAL KITCHEN", lokasi: "PB-FNB-L3-42", sn: "241249144", zona: "L3-A" },
+            { nama: "KIDZSTATION", lokasi: "PB-FNB-L3-42B", sn: "241249133", zona: "L3-B" },
+            { nama: "WATSONS", lokasi: "PB-FNB-L3-44", sn: "241190245", zona: "L3-A" },
+            { nama: "SOLARIA", lokasi: "PB-FNB-L3-48", sn: "250114059", zona: "L3-A" },
+            { nama: "LOLY POLY", lokasi: "PB-FNB-L3-71 ISO", sn: "241249157", zona: "L3-A" },
+            { nama: "AOERA PARFUME", lokasi: "PB-FNB-L3-72 ISO", sn: "241249150", zona: "L3-A" },
+            { nama: "BAK&CO", lokasi: "PB-RETAIL-L3-30", sn: "250228005", zona: "L3-B" },
+            { nama: "EATERIA", lokasi: "TOTAL LISTRIK", sn: "", zona: "L3-B" },
+            { nama: "SUSHI GO", lokasi: "PB-RETAIL-L3-31", sn: "241249215", zona: "L3-B" },
+            { nama: "BAKOEL BAMBOE", lokasi: "PB-RETAIL-L3-32", sn: "250228070", zona: "L3-B" },
+            { nama: "BAKOEL BAMBOE", lokasi: "PB-RETAIL-L3-33", sn: "250916247", zona: "L3-B" },
+            { nama: "TOYS KINGDOM", lokasi: "PB-RETAIL-L3-35", sn: "250916503", zona: "L3-B" },
+            { nama: "TOKO MAS BAGONG", lokasi: "PB-RETAIL-L3-37", sn: "241249180", zona: "L3-B" },
+            { nama: "TOKO MAS SEMAR", lokasi: "PB-RETAIL-L3-38", sn: "241249143", zona: "L3-B" },
+            { nama: "SEMBADA GOLD", lokasi: "PB-RETAIL-L3-39", sn: "250228001", zona: "L3-B" },
+            { nama: "SHEM RAMEN", lokasi: "PB-RETAIL-L3-57A,57B", sn: "250228010", zona: "L3-B" },
+            { nama: "WINGSTOP", lokasi: "PB-RETAIL-L3-58", sn: "", zona: "L3-B" },
+            { nama: "WINGSTOP", lokasi: "PB-RETAIL-L3-59", sn: "", zona: "L3-B" },
+            { nama: "MOTHERCARE,WILIO", lokasi: "PB-RETAIL-L3-60,61,62", sn: "250916522", zona: "L3-B" },
+            { nama: "AREA KORIDOR SHEM RAMEN", lokasi: "PB-RETAIL-L3-66 ISO", sn: "250228093", zona: "L3-B" },
+            { nama: "JOLLY TIME", lokasi: "PB-RETAIL-L3-67 ISO", sn: "250228029", zona: "L3-B" },
+            { nama: "WINGSTOP", lokasi: "PB-RETAIL-L3-68 ISO", sn: "", zona: "L3-B" },
+            { nama: "RICA-RICO", lokasi: "PB-RETAIL-L3-69A ISO", sn: "", zona: "L3-B" },
+            { nama: "Alchemy Tea", lokasi: "PB-RETAIL-L3-69B ISO", sn: "241249198", zona: "L3-B" },
+            { nama: "CINEMA XXI", lokasi: "351004 (Bedeng)", sn: "", zona: "L3-C" },
+            { nama: "CINEMA XXI", lokasi: "1459050 (Tenant)", sn: "", zona: "L3-C" }
+        ];
+
         let padTeknisi, padTenant;
         let fotoBase64 = '';
 
@@ -158,6 +199,32 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Populate Dropdown Tenant
+            const selectEl = document.getElementById('tenantSelect');
+            masterTenants.forEach((t, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = `${t.nama} - ${t.lokasi} (${t.zona})`;
+                selectEl.appendChild(opt);
+            });
+
+            // Auto-fill form saat tenant dipilih
+            selectEl.addEventListener('change', (e) => {
+                const idx = e.target.value;
+                if (idx !== "") {
+                    const selected = masterTenants[idx];
+                    document.getElementById('namaTenant').value = selected.nama;
+                    document.getElementById('noLot').value = selected.lokasi;
+                    document.getElementById('serialNumber').value = selected.sn;
+                    document.getElementById('zona').value = selected.zona;
+                } else {
+                    document.getElementById('namaTenant').value = '';
+                    document.getElementById('noLot').value = '';
+                    document.getElementById('serialNumber').value = '';
+                    document.getElementById('zona').value = '';
+                }
+            });
+
             const canvasTeknisi = document.getElementById('teknisiCanvas');
             const canvasTenant = document.getElementById('tenantCanvas');
 
@@ -167,7 +234,6 @@
             padTeknisi = new SignaturePad(canvasTeknisi, { backgroundColor: 'rgb(255, 255, 255)' });
             padTenant = new SignaturePad(canvasTenant, { backgroundColor: 'rgb(255, 255, 255)' });
 
-            // Button Event Listeners
             document.getElementById('btnHapusPadTeknisi').addEventListener('click', () => padTeknisi.clear());
             document.getElementById('btnHapusPadTenant').addEventListener('click', () => padTenant.clear());
             
@@ -179,7 +245,6 @@
             document.getElementById('btnHapusFoto').addEventListener('click', removePhoto);
         });
 
-        // Preview & Convert Photo to Base64
         function previewImage(event) {
             const file = event.target.files[0];
             if (file) {
@@ -227,6 +292,7 @@
             const payload = {
                 namaTenant: document.getElementById('namaTenant').value,
                 noLot: document.getElementById('noLot').value,
+                serialNumber: document.getElementById('serialNumber').value,
                 zona: document.getElementById('zona').value,
                 jenisPencatatan: document.getElementById('jenisPencatatan').value,
                 angka: parseFloat(document.getElementById('angka').value).toFixed(4),
@@ -247,7 +313,6 @@
 
                 alert('Data pencatatan berhasil dikirim!');
                 
-                // Reset form
                 document.getElementById('utilityForm').reset();
                 padTeknisi.clear();
                 padTenant.clear();
