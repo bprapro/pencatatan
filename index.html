@@ -34,16 +34,21 @@
                     Informasi Tenant & Lokasi
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Dropdown 1: Cari Nama Tenant Unik -->
-                    <div>
+                    
+                    <!-- 1. Pencarian Custom Dropdown -->
+                    <div class="relative">
                         <label class="block text-xs font-medium text-gray-700 mb-1">1. Nama Tenant <span class="text-red-500">*</span></label>
-                        <input type="text" id="tenantSearchInput" list="tenantListOptions" required placeholder="Memuat tenant..." disabled
+                        <input type="text" id="tenantSearchInput" autocomplete="off" required placeholder="Memuat tenant..." disabled
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:bg-gray-100">
-                        <datalist id="tenantListOptions"></datalist>
+                        
+                        <!-- Box List Dropdown Hasil Pencarian -->
+                        <div id="dropdownList" class="absolute z-30 left-0 right-0 top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto hidden">
+                            <!-- Diisi via JavaScript -->
+                        </div>
                         <input type="hidden" id="namaTenant">
                     </div>
 
-                    <!-- Dropdown 2: Pilih Lokasi/Lot dari Tenant Terpilih -->
+                    <!-- 2. Select No Lot -->
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">2. No Lot / Lokasi <span class="text-red-500">*</span></label>
                         <select id="noLotSelect" disabled required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50">
@@ -160,6 +165,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
 
         let masterTenants = [];
+        let uniqueNames = [];
         let padTeknisi, padTenant;
         let fotoBase64 = '';
 
@@ -172,25 +178,18 @@
 
         async function fetchMasterTenant() {
             const searchInput = document.getElementById('tenantSearchInput');
-            const dataList = document.getElementById('tenantListOptions');
             const listContainer = document.getElementById('tenantListContainer');
             
             try {
                 const res = await fetch(SCRIPT_URL);
                 masterTenants = await res.json();
 
-                dataList.innerHTML = '';
                 listContainer.innerHTML = '';
 
-                // Ambil daftar Nama Tenant unik saja untuk pencarian
-                const uniqueNames = [...new Set(masterTenants.map(t => t.nama.trim()))].sort();
-                uniqueNames.forEach(nama => {
-                    const opt = document.createElement('option');
-                    opt.value = nama;
-                    dataList.appendChild(opt);
-                });
+                // Kumpulkan nama unik
+                uniqueNames = [...new Set(masterTenants.map(t => t.nama.trim()))].sort();
 
-                // Populate List Modal
+                // Populate List di Modal Kelola
                 masterTenants.forEach((t) => {
                     const rowDiv = document.createElement('div');
                     rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
@@ -233,39 +232,67 @@
             fetchMasterTenant();
 
             const searchInput = document.getElementById('tenantSearchInput');
+            const dropdownList = document.getElementById('dropdownList');
             const noLotSelect = document.getElementById('noLotSelect');
             const snInput = document.getElementById('serialNumber');
             const zonaInput = document.getElementById('zona');
             const hiddenNama = document.getElementById('namaTenant');
             const hiddenLot = document.getElementById('noLot');
 
-            // 1. EVENT: Saat Nama Tenant Dipilih
-            searchInput.addEventListener('input', (e) => {
-                const typedName = e.target.value.trim();
-                const matchedTenants = masterTenants.filter(t => t.nama.trim().toLowerCase() === typedName.toLowerCase());
+            // Render opsi ke custom dropdown
+            function renderDropdown(filterText = '') {
+                dropdownList.innerHTML = '';
+                const filtered = uniqueNames.filter(name => name.toLowerCase().includes(filterText.toLowerCase()));
+
+                if (filtered.length === 0) {
+                    dropdownList.innerHTML = `<div class="p-2 text-xs text-gray-400">Tidak ditemukan</div>`;
+                } else {
+                    filtered.forEach(name => {
+                        const item = document.createElement('div');
+                        item.className = 'px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer border-b last:border-b-0';
+                        item.textContent = name;
+                        item.onclick = () => selectTenantName(name);
+                        dropdownList.appendChild(item);
+                    });
+                }
+                dropdownList.classList.remove('hidden');
+            }
+
+            // Fokus/Ketik pada input pencarian
+            searchInput.addEventListener('focus', () => renderDropdown(searchInput.value));
+            searchInput.addEventListener('input', (e) => renderDropdown(e.target.value));
+
+            // Sembunyikan dropdown jika klik di luar
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !dropdownList.contains(e.target)) {
+                    dropdownList.classList.add('hidden');
+                }
+            });
+
+            // Pilih Tenant dari Dropdown Custom
+            function selectTenantName(name) {
+                searchInput.value = name;
+                hiddenNama.value = name;
+                dropdownList.classList.add('hidden');
+
+                const matchedTenants = masterTenants.filter(t => t.nama.trim().toLowerCase() === name.toLowerCase());
 
                 noLotSelect.innerHTML = '';
                 snInput.value = '';
                 zonaInput.value = '';
-                hiddenNama.value = '';
                 hiddenLot.value = '';
 
                 if (matchedTenants.length > 0) {
-                    hiddenNama.value = matchedTenants[0].nama;
                     noLotSelect.disabled = false;
                     noLotSelect.classList.remove('bg-gray-50');
 
                     if (matchedTenants.length === 1) {
-                        // Jika cuma punya 1 lokasi
                         const opt = document.createElement('option');
                         opt.value = matchedTenants[0].lokasi;
                         opt.textContent = `${matchedTenants[0].lokasi} (${matchedTenants[0].zona})`;
                         noLotSelect.appendChild(opt);
-                        
-                        // Auto trigger select
                         selectLocation(matchedTenants[0]);
                     } else {
-                        // Jika punya lebih dari 1 lokasi (seperti AZKO)
                         const defaultOpt = document.createElement('option');
                         defaultOpt.value = "";
                         defaultOpt.textContent = `-- Pilih Salah Satu Lot (${matchedTenants.length} Tersedia) --`;
@@ -278,23 +305,15 @@
                             noLotSelect.appendChild(opt);
                         });
                     }
-                } else {
-                    noLotSelect.disabled = true;
-                    noLotSelect.classList.add('bg-gray-50');
-                    noLotSelect.innerHTML = '<option value="">-- Pilih Tenant Dulu --</option>';
-                    resetSNField();
                 }
-            });
+            }
 
-            // 2. EVENT: Saat No Lot Dipilih dari Dropdown
+            // Saat Lot Dipilih
             noLotSelect.addEventListener('change', (e) => {
                 const selectedLot = e.target.value;
                 const tenantName = hiddenNama.value;
-                
                 const selected = masterTenants.find(t => t.nama.trim().toLowerCase() === tenantName.toLowerCase() && t.lokasi === selectedLot);
-                if (selected) {
-                    selectLocation(selected);
-                }
+                if (selected) selectLocation(selected);
             });
 
             function selectLocation(tenantObj) {
@@ -313,12 +332,7 @@
                 }
             }
 
-            function resetSNField() {
-                snInput.readOnly = true;
-                snInput.className = "w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-md text-sm font-medium";
-            }
-
-            // Signature Pads
+            // Canvas & Signature Pad
             const canvasTeknisi = document.getElementById('teknisiCanvas');
             const canvasTenant = document.getElementById('tenantCanvas');
             resizeCanvas(canvasTeknisi);
@@ -330,7 +344,7 @@
             document.getElementById('btnHapusPadTeknisi').onclick = () => padTeknisi.clear();
             document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
 
-            // Photo handling
+            // Photo Handler
             document.getElementById('btnAmbilFoto').onclick = () => document.getElementById('fotoInput').click();
             document.getElementById('fotoInput').onchange = (e) => {
                 const file = e.target.files[0];
@@ -355,7 +369,7 @@
             document.getElementById('btnOpenManageModal').onclick = () => modal.classList.remove('hidden');
             document.getElementById('btnCloseManageModal').onclick = () => modal.classList.add('hidden');
 
-            // Submit Form Tambah Tenant Baru
+            // Form Tambah Tenant
             document.getElementById('addTenantForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const submitBtn = document.getElementById('btnAddTenantSubmit');
