@@ -14,42 +14,50 @@
 <body class="bg-gray-100 min-h-screen pb-12">
 
     <header class="bg-blue-600 text-white shadow-md">
-        <div class="max-w-xl mx-auto px-4 py-5 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold">Form Pencatatan Listrik & Air</h1>
-                <p class="text-blue-100 text-xs">Utility Check System</p>
-            </div>
-            <button id="btnOpenManageModal" type="button" class="bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-2 rounded-lg font-medium border border-blue-400 transition shadow">
-                ⚙️ Kelola Master Tenant
-            </button>
+        <div class="max-w-xl mx-auto px-4 py-5">
+            <h1 class="text-xl font-bold">Form Pencatatan Listrik & Air</h1>
+            <p class="text-blue-100 text-xs">Utility Check System</p>
         </div>
     </header>
 
     <main class="max-w-xl mx-auto mt-6 px-4 space-y-6">
         
-        <!-- FORM UTAMA -->
         <form id="utilityForm" class="bg-white rounded-lg shadow-md p-6 space-y-5">
+            
             <div id="editNotice" class="hidden bg-amber-50 border-l-4 border-amber-500 p-3 rounded text-xs text-amber-800 flex justify-between items-center">
-                <span>⚠️ Mode Edit: Anda sedang mengubah data baris ke-<b id="editRowNumber"></b></span>
+                <span>⚠️ Mode Edit: Baris ke-<b id="editRowNumber"></b></span>
                 <button type="button" id="btnCancelEdit" class="text-amber-700 underline font-semibold">Batal Edit</button>
             </div>
 
-            <!-- Pilih Tenant / Lokasi -->
+            <!-- STEP 1: PILIH KATEGORI SHEET MASTER DATA -->
             <div class="border-b pb-4">
+                <label class="block text-sm font-bold text-gray-800 mb-2">1. Pilih Kategori Master Data <span class="text-red-500">*</span></label>
+                <select id="kategoriSheet" required class="w-full px-3 py-2.5 border-2 border-blue-500 bg-blue-50 rounded-lg text-sm font-semibold text-blue-900 focus:ring-2 focus:ring-blue-600">
+                    <option value="" disabled selected>-- Pilih Kategori Utility --</option>
+                    <option value="AIR">💧 AIR TENANT</option>
+                    <option value="AIR EATERIA">💧 AIR EATERIA</option>
+                    <option value="LISTRIK TENANT">⚡ LISTRIK TENANT</option>
+                    <option value="LISTRIK EATERIA">⚡ LISTRIK EATERIA</option>
+                    <option value="LISTRIK STORAGE">⚡ LISTRIK STORAGE</option>
+                </select>
+            </div>
+
+            <!-- STEP 2: PILIH TENANT (Muncul setelah kategori dipilih) -->
+            <div id="sectionTenant" class="border-b pb-4 opacity-50 pointer-events-none transition-all">
                 <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    Pilih Tenant / Lokasi
+                    2. Pilih Tenant / Lokasi
                 </h2>
 
                 <div class="space-y-3">
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">🔍</span>
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
                         <input type="text" id="tenantSearchInput" autocomplete="off" placeholder="Ketik nama tenant / No Lot..."
-                               class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm">
+                               class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
 
                     <div class="border border-gray-300 rounded-lg max-h-48 overflow-y-auto bg-white divide-y divide-gray-100" id="tenantListBox">
-                        <div class="p-3 text-center text-xs text-gray-400">Memuat daftar tenant...</div>
+                        <div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>
                     </div>
                 </div>
 
@@ -57,39 +65,35 @@
                 <input type="hidden" id="namaTenant" required>
                 <input type="hidden" id="noLot">
 
-                <!-- Dropdown Pilihan Jika Tenant punya Banyak Lot -->
+                <!-- Lot Dropdown untuk Lot ganda -->
                 <div id="lotDropdownContainer" class="hidden mt-3">
-                    <label class="block text-xs font-semibold text-blue-700 mb-1">Pilih No Lot / Lokasi Khusus:</label>
-                    <select id="lotSelectDropdown" class="w-full px-3 py-2 border border-blue-500 bg-blue-50 rounded-md text-sm font-semibold text-blue-900 focus:ring-2 focus:ring-blue-600">
-                    </select>
+                    <label class="block text-xs font-semibold text-blue-700 mb-1">Pilih No Lot / Lokasi Spesifik:</label>
+                    <select id="lotSelectDropdown" class="w-full px-3 py-2 border border-blue-500 bg-blue-50 rounded-md text-sm font-semibold text-blue-900"></select>
                 </div>
 
-                <!-- Input SN & Zona Bisa Diisi Manual ATAU Otomatis -->
+                <!-- Input Field SN & Zona (Auto Fill / BISA MANUAL) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN) <span class="text-gray-400 font-normal">(Bisa Diisi Manual/Opsional)</span></label>
-                        <input type="text" id="serialNumber" placeholder="Ketik SN (opsional)..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN) <span class="text-gray-400 font-normal">(Opsional/Manual)</span></label>
+                        <input type="text" id="serialNumber" placeholder="Ketik SN..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area <span class="text-gray-400 font-normal">(Bisa Diisi Manual/Opsional)</span></label>
-                        <input type="text" id="zona" placeholder="Ketik Zona (opsional)..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area <span class="text-gray-400 font-normal">(Opsional/Manual)</span></label>
+                        <input type="text" id="zona" placeholder="Ketik Zona..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
                     </div>
                 </div>
             </div>
 
-            <!-- Data Pencatatan Meteran -->
+            <!-- STEP 3: DATA PENCATATAN -->
             <div class="border-b pb-4">
                 <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Data Pencatatan Meteran
+                    3. Data Pencatatan Meteran
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Pencatatan <span class="text-red-500">*</span></label>
-                        <select id="jenisPencatatan" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <option value="Listrik">⚡ Listrik (kWh)</option>
-                            <option value="Air">💧 Air (m³)</option>
-                        </select>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Utility <span class="text-red-500">*</span></label>
+                        <input type="text" id="jenisPencatatan" readonly class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm font-bold text-gray-700">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Angka Meteran <span class="text-red-500">*</span></label>
@@ -110,11 +114,11 @@
                 </div>
             </div>
 
-            <!-- Tanda Tangan -->
+            <!-- STEP 4: TANDA TANGAN -->
             <div class="space-y-4">
                 <h2 class="text-base font-semibold text-gray-800 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    Tanda Tangan & Verifikasi
+                    4. Verifikasi Tanda Tangan
                 </h2>
                 <div>
                     <div class="flex justify-between items-center mb-1">
@@ -139,17 +143,17 @@
             </button>
         </form>
 
-        <!-- Riwayat Pencatatan -->
+        <!-- RIWAYAT LOGSET -->
         <section class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center justify-between">
-                <span>📋 Riwayat Pencatatan Terakhir</span>
+                <span>📋 Riwayat LOGSET (Terakhir)</span>
                 <button id="btnRefreshHistory" type="button" class="text-xs text-blue-600 hover:underline">🔄 Refresh</button>
             </h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-gray-600 border-collapse">
                     <thead class="bg-gray-50 text-gray-700 border-b">
                         <tr>
-                            <th class="p-2">Tenant & Lot/SN</th>
+                            <th class="p-2">Kategori & Tenant</th>
                             <th class="p-2">Jenis</th>
                             <th class="p-2">Angka</th>
                             <th class="p-2 text-center">Aksi</th>
@@ -163,36 +167,6 @@
         </section>
 
     </main>
-
-    <!-- Modal Kelola Master Tenant -->
-    <div id="manageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-gray-800 text-lg">Kelola Master Data Tenant</h3>
-                <button id="btnCloseManageModal" type="button" class="text-gray-500 hover:text-red-600 font-bold text-xl">&times;</button>
-            </div>
-
-            <form id="addTenantForm" class="mt-4 border-b pb-4 space-y-3">
-                <h4 class="text-sm font-semibold text-blue-600">+ Tambah Tenant Baru</h4>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="newNama" placeholder="Nama Tenant" class="px-2 py-1.5 border rounded text-xs">
-                    <input type="text" id="newLokasi" required placeholder="No Lot / Lokasi" class="px-2 py-1.5 border rounded text-xs">
-                    <input type="text" id="newSN" placeholder="Serial Number (SN)" class="px-2 py-1.5 border rounded text-xs">
-                    <input type="text" id="newZona" placeholder="Zona (contoh: LG-A)" class="px-2 py-1.5 border rounded text-xs">
-                </div>
-                <button type="submit" id="btnAddTenantSubmit" class="w-full py-2 bg-green-600 text-white text-xs font-semibold rounded hover:bg-green-700">
-                    Simpan Tenant Baru
-                </button>
-            </form>
-
-            <div class="mt-4">
-                <h4 class="text-sm font-semibold text-gray-700 mb-2">Daftar Tenant (Hapus Data)</h4>
-                <div id="tenantListContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <p class="text-xs text-gray-400">Memuat data...</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
@@ -216,26 +190,22 @@
             canvas.getContext("2d").scale(ratio, ratio);
         }
 
-        async function fetchMasterTenant() {
-            const listContainer = document.getElementById('tenantListContainer');
+        // Ambil Data Master berdasarkan Kategori Sheet
+        async function fetchMasterByCategory(category) {
+            const box = document.getElementById('tenantListBox');
+            box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
+            
             try {
-                const res = await fetch(SCRIPT_URL);
+                const res = await fetch(`${SCRIPT_URL}?action=GET_MASTER_BY_CATEGORY&category=${encodeURIComponent(category)}`);
                 rawMasterTenants = await res.json();
                 
                 groupedTenants = {};
-                listContainer.innerHTML = '';
-
                 rawMasterTenants.forEach((t) => {
                     let displayName = cleanName(t.nama);
-                    if (!displayName) {
-                        displayName = t.lokasi || 'Tanpa Nama';
-                    }
+                    if (!displayName) displayName = t.lokasi || 'Tanpa Nama';
 
                     if (!groupedTenants[displayName]) {
-                        groupedTenants[displayName] = {
-                            displayName: displayName,
-                            items: []
-                        };
+                        groupedTenants[displayName] = { displayName: displayName, items: [] };
                     }
                     groupedTenants[displayName].items.push({
                         namaAsli: t.nama || '',
@@ -243,23 +213,11 @@
                         sn: t.sn || '',
                         zona: t.zona || ''
                     });
-
-                    const rowDiv = document.createElement('div');
-                    rowDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs border';
-                    rowDiv.innerHTML = `
-                        <div>
-                            <span class="font-bold text-gray-800">${t.nama || t.lokasi}</span>
-                            <span class="text-gray-500 block">Lot: ${t.lokasi || '-'} | SN: ${t.sn || '-'} | Zona: ${t.zona || '-'}</span>
-                        </div>
-                        <button onclick="deleteTenant('${t.nama}', '${t.sn}', '${t.lokasi}')" class="bg-red-500 text-white px-2 py-1 rounded text-[10px] hover:bg-red-700">Hapus</button>
-                    `;
-                    listContainer.appendChild(rowDiv);
                 });
 
                 renderTenantList('');
             } catch (err) {
-                console.error("Gagal load tenant:", err);
-                document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat data tenant</div>`;
+                box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}</div>`;
             }
         }
 
@@ -276,7 +234,7 @@
             });
 
             if (filtered.length === 0) {
-                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada tenant / lot yang sesuai</div>`;
+                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada data tenant di sheet ini</div>`;
                 return;
             }
 
@@ -303,21 +261,16 @@
 
         function selectTenantGroup(group) {
             selectedTenantGroup = group;
-
             const dropdownContainer = document.getElementById('lotDropdownContainer');
             const selectDropdown = document.getElementById('lotSelectDropdown');
 
             if (group.items.length > 1) {
                 dropdownContainer.classList.remove('hidden');
-                let optionsHtml = group.items.map((item, idx) => {
-                    const labelLot = item.lokasi ? `Lot: ${item.lokasi}` : `SN: ${item.sn}`;
-                    return `<option value="${idx}">${labelLot}</option>`;
+                selectDropdown.innerHTML = group.items.map((item, idx) => {
+                    return `<option value="${idx}">Lot: ${item.lokasi || '-'} | SN: ${item.sn || '-'}</option>`;
                 }).join('');
-
-                selectDropdown.innerHTML = optionsHtml;
                 selectDropdown.onchange = () => applySubItemSelection(group.items[selectDropdown.value]);
                 applySubItemSelection(group.items[0]);
-
             } else if (group.items.length === 1) {
                 dropdownContainer.classList.add('hidden');
                 applySubItemSelection(group.items[0]);
@@ -329,7 +282,6 @@
         function applySubItemSelection(item) {
             document.getElementById('namaTenant').value = item.namaAsli || item.lokasi;
             document.getElementById('noLot').value = item.lokasi || '';
-            // Auto-fill jika ada di master data, jika kosong dipersilakan diisi manual
             document.getElementById('serialNumber').value = item.sn || '';
             document.getElementById('zona').value = item.zona || '';
         }
@@ -342,7 +294,7 @@
 
                 tbody.innerHTML = '';
                 if (historyList.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat pencatatan</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
                     return;
                 }
 
@@ -352,10 +304,11 @@
                     tr.className = 'hover:bg-gray-50';
                     tr.innerHTML = `
                         <td class="p-2">
-                            <div class="font-bold text-gray-800">${cleanNama}</div>
+                            <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${item.kategoriSheet}</span>
+                            <div class="font-bold text-gray-800 mt-1">${cleanNama}</div>
                             <div class="text-[10px] text-gray-500">Lot: ${item.noLot || '-'} | SN: ${item.sn || '-'}</div>
                         </td>
-                        <td class="p-2">${item.jenis}</td>
+                        <td class="p-2 font-semibold">${item.jenis}</td>
                         <td class="p-2 font-mono font-bold text-blue-600">${item.angka}</td>
                         <td class="p-2 text-center">
                             <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
@@ -374,22 +327,24 @@
             document.getElementById('editRowNumber').textContent = item.rowIndex;
             document.getElementById('editNotice').classList.remove('hidden');
 
-            document.getElementById('jenisPencatatan').value = item.jenis;
+            document.getElementById('kategoriSheet').value = item.kategoriSheet;
+            document.getElementById('kategoriSheet').dispatchEvent(new Event('change'));
+
             document.getElementById('angka').value = item.angka;
             document.getElementById('namaTeknisi').value = item.namaTeknisi;
             document.getElementById('namaPenandatanganTenant').value = item.namaTenantPenandatangan;
 
-            const cName = cleanName(item.namaTenant) || item.noLot;
-            if (groupedTenants[cName]) {
-                selectTenantGroup(groupedTenants[cName]);
-            } else {
-                document.getElementById('namaTenant').value = item.namaTenant;
-                document.getElementById('noLot').value = item.noLot;
-            }
-
-            // Isi nilai SN dan Zona sesuai riwayat yang diedit
-            document.getElementById('serialNumber').value = item.sn;
-            document.getElementById('zona').value = item.zona;
+            setTimeout(() => {
+                const cName = cleanName(item.namaTenant) || item.noLot;
+                if (groupedTenants[cName]) {
+                    selectTenantGroup(groupedTenants[cName]);
+                } else {
+                    document.getElementById('namaTenant').value = item.namaTenant;
+                    document.getElementById('noLot').value = item.noLot;
+                }
+                document.getElementById('serialNumber').value = item.sn;
+                document.getElementById('zona').value = item.zona;
+            }, 800);
 
             document.getElementById('submitBtn').innerText = 'Simpan Perubahan (Update)';
             document.getElementById('submitBtn').className = 'w-full py-3 bg-amber-600 text-white font-semibold rounded-lg shadow-md hover:bg-amber-700';
@@ -401,37 +356,35 @@
             document.getElementById('editingRowIndex').value = '';
             document.getElementById('editNotice').classList.add('hidden');
             document.getElementById('utilityForm').reset();
+            document.getElementById('sectionTenant').classList.add('opacity-50', 'pointer-events-none');
             document.getElementById('lotDropdownContainer').classList.add('hidden');
             selectedTenantGroup = null;
-            renderTenantList('');
+            document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>`;
 
             document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
             document.getElementById('submitBtn').className = 'w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700';
         }
 
-        async function deleteTenant(nama, sn, lokasi) {
-            if (!confirm(`Yakin ingin menghapus tenant/lot "${nama || lokasi}"?`)) return;
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: "DELETE_TENANT", nama, sn, lokasi })
-                });
-                alert('Permintaan hapus terkirim!');
-                setTimeout(fetchMasterTenant, 1500);
-            } catch (e) {
-                alert('Gagal menghapus: ' + e.message);
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            fetchMasterTenant();
             fetchHistory();
 
             document.getElementById('btnRefreshHistory').onclick = fetchHistory;
             document.getElementById('btnCancelEdit').onclick = cancelEditMode;
             document.getElementById('tenantSearchInput').addEventListener('input', (e) => renderTenantList(e.target.value));
+
+            // Listener Perubahan Dropdown Kategori Sheet
+            document.getElementById('kategoriSheet').addEventListener('change', (e) => {
+                const category = e.target.value;
+                const sectionTenant = document.getElementById('sectionTenant');
+                const jenisInput = document.getElementById('jenisPencatatan');
+
+                if (category) {
+                    sectionTenant.classList.remove('opacity-50', 'pointer-events-none');
+                    jenisInput.value = category.startsWith('AIR') ? 'Air (m³)' : 'Listrik (kWh)';
+                    selectedTenantGroup = null;
+                    fetchMasterByCategory(category);
+                }
+            });
 
             const canvasTeknisi = document.getElementById('teknisiCanvas');
             const canvasTenant = document.getElementById('tenantCanvas');
@@ -462,40 +415,6 @@
                 document.getElementById('fotoInput').value = '';
                 document.getElementById('photoPreviewContainer').classList.add('hidden');
             };
-
-            const modal = document.getElementById('manageModal');
-            document.getElementById('btnOpenManageModal').onclick = () => modal.classList.remove('hidden');
-            document.getElementById('btnCloseManageModal').onclick = () => modal.classList.add('hidden');
-
-            document.getElementById('addTenantForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const submitBtn = document.getElementById('btnAddTenantSubmit');
-                submitBtn.disabled = true;
-
-                const newPayload = {
-                    action: "ADD_TENANT",
-                    nama: cleanName(document.getElementById('newNama').value),
-                    lokasi: document.getElementById('newLokasi').value,
-                    sn: document.getElementById('newSN').value,
-                    zona: document.getElementById('newZona').value
-                };
-
-                try {
-                    await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newPayload)
-                    });
-                    alert('Tenant / Lot berhasil ditambahkan!');
-                    document.getElementById('addTenantForm').reset();
-                    setTimeout(fetchMasterTenant, 1500);
-                } catch (err) {
-                    alert('Gagal menambah tenant: ' + err.message);
-                } finally {
-                    submitBtn.disabled = false;
-                }
-            };
         });
 
         document.getElementById('utilityForm').onsubmit = async function(e) {
@@ -503,7 +422,7 @@
             const editingRowIndex = document.getElementById('editingRowIndex').value;
 
             if (!document.getElementById('namaTenant').value) {
-                return alert('Pilih salah satu Tenant / Lot dari daftar!');
+                return alert('Pilih salah satu Tenant / Lokasi dari daftar!');
             }
             if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
             if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
@@ -515,10 +434,11 @@
             const payload = {
                 action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
                 rowIndex: editingRowIndex || null,
+                kategoriSheet: document.getElementById('kategoriSheet').value,
                 namaTenant: cleanName(document.getElementById('namaTenant').value),
                 noLot: document.getElementById('noLot').value,
-                serialNumber: document.getElementById('serialNumber').value, // BISA DIAKSES (OTOMATIS / HASIL KETIK MANUAL)
-                zona: document.getElementById('zona').value,                 // BISA DIAKSES (OTOMATIS / HASIL KETIK MANUAL)
+                serialNumber: document.getElementById('serialNumber').value,
+                zona: document.getElementById('zona').value,
                 jenisPencatatan: document.getElementById('jenisPencatatan').value,
                 angka: parseFloat(document.getElementById('angka').value).toFixed(4),
                 namaTeknisi: document.getElementById('namaTeknisi').value,
@@ -535,7 +455,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                alert(editingRowIndex ? 'Data berhasil diperbarui!' : 'Data pencatatan berhasil dikirim!');
+                alert(editingRowIndex ? 'Data berhasil diperbarui!' : 'Data pencatatan berhasil disimpan!');
                 cancelEditMode();
                 padTeknisi.clear();
                 padTenant.clear();
