@@ -228,45 +228,66 @@
     }
 
     async function fetchMasterByCategory(category) {
-        const box = document.getElementById('tenantListBox');
-        box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
+    const box = document.getElementById('tenantListBox');
+    box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
+    
+    try {
+        const res = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(category)}`);
+        const jsonResponse = await res.json();
         
-        try {
-            const res = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(category)}`);
-            const jsonResponse = await res.json();
-            
-            if (jsonResponse.status === "ERROR") {
-                throw new Error(jsonResponse.message);
-            }
-
-            rawMasterTenants = jsonResponse.data || [];
-            groupedTenants = {};
-
-            rawMasterTenants.forEach((t) => {
-                const namaValue = t["NAMA TENANT"] || "";
-                const lokasiValue = t["LOKASI"] || "";
-                const snValue = t["SN Meter"] || t["SN"] || "";
-                const zonaValue = t["ZONA"] || "";
-
-                let displayName = cleanName(namaValue);
-                if (!displayName) displayName = lokasiValue || 'Tanpa Nama';
-
-                if (!groupedTenants[displayName]) {
-                    groupedTenants[displayName] = { displayName: displayName, items: [] };
-                }
-                groupedTenants[displayName].items.push({
-                    namaAsli: namaValue,
-                    lokasi: lokasiValue,
-                    sn: snValue,
-                    zona: zonaValue
-                });
-            });
-
-            renderTenantList('');
-        } catch (err) {
-            box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}: ${err.message}</div>`;
+        if (jsonResponse.status === "ERROR") {
+            throw new Error(jsonResponse.message);
         }
+
+        rawMasterTenants = jsonResponse.data || [];
+        groupedTenants = {};
+
+        rawMasterTenants.forEach((t) => {
+            // Helper function untuk mencari nilai key tanpa memedulikan spasi / kapitalisasi
+            const getVal = (targetKeys) => {
+                const foundKey = Object.keys(t).find(k => 
+                    targetKeys.includes(k.trim().toUpperCase())
+                );
+                return foundKey ? String(t[foundKey]).trim() : "";
+            };
+
+            // Mengambil data dengan berbagai variasi nama kolom
+            const namaValue = getVal(["NAMA TENANT", "NAMA", "TENANT"]);
+            const lokasiValue = getVal(["LOKASI", "NO LOT", "LOT"]);
+            
+            // PENCARIAN FLEXIBEL UNTUK SERIAL NUMBER
+            const snValue = getVal([
+                "SERIAL NUMBER", 
+                "SERIALNUMBER", 
+                "SN METER", 
+                "SN", 
+                "NO SERIAL", 
+                "SERIAL NO", 
+                "S/N"
+            ]);
+            
+            const zonaValue = getVal(["ZONA", "AREA"]);
+
+            let displayName = cleanName(namaValue);
+            if (!displayName) displayName = lokasiValue || 'Tanpa Nama';
+
+            if (!groupedTenants[displayName]) {
+                groupedTenants[displayName] = { displayName: displayName, items: [] };
+            }
+            groupedTenants[displayName].items.push({
+                namaAsli: namaValue,
+                lokasi: lokasiValue,
+                sn: snValue,
+                zona: zonaValue
+            });
+        });
+
+        renderTenantList('');
+    } catch (err) {
+        box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}: ${err.message}</div>`;
     }
+}
+
 
     function renderTenantList(filterKeyword = '') {
         const box = document.getElementById('tenantListBox');
