@@ -3,164 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pencatatan Meteran Listrik & Air</title>
+    <title>Pencatatan Meteran LOGSET</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Signature Pad Library CDN -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <style>
-        .canvas-container { position: relative; width: 100%; height: 160px; background-color: #f9fafb; border: 2px dashed #d1d5db; border-radius: 0.5rem; touch-action: none; }
-        canvas { width: 100%; height: 100%; border-radius: 0.5rem; }
-    </style>
 </head>
-<body class="bg-gray-100 min-h-screen pb-12">
+<body class="bg-gray-100 min-h-screen pb-10">
 
-    <header class="bg-blue-600 text-white shadow-md">
-        <div class="max-w-xl mx-auto px-4 py-5">
-            <h1 class="text-xl font-bold">Form Pencatatan Listrik & Air</h1>
-            <p class="text-blue-100 text-xs">Utility Check System</p>
+    <div class="max-w-md mx-auto p-4">
+        <!-- HEADER -->
+        <div class="bg-blue-600 text-white p-4 rounded-t-2xl shadow-lg text-center">
+            <h1 class="text-xl font-bold">Form Pencatatan LOGSET</h1>
+            <p class="text-xs opacity-80">Sistem Input & Monitoring Utility</p>
         </div>
-    </header>
 
-    <main class="max-w-xl mx-auto mt-6 px-4 space-y-6">
-        
-        <form id="utilityForm" class="bg-white rounded-lg shadow-md p-6 space-y-5">
-            
-            <div id="editNotice" class="hidden bg-amber-50 border-l-4 border-amber-500 p-3 rounded text-xs text-amber-800 flex justify-between items-center">
-                <span>⚠️ Mode Edit: Baris ke-<b id="editRowNumber"></b></span>
-                <button type="button" id="btnCancelEdit" class="text-amber-700 underline font-semibold">Batal Edit</button>
-            </div>
-
-            <!-- STEP 1: KATEGORI -->
-            <div class="border-b pb-4">
-                <label class="block text-sm font-bold text-gray-800 mb-2">1. Pilih Kategori Master Data <span class="text-red-500">*</span></label>
-                <select id="kategoriSheet" required class="w-full px-3 py-2.5 border-2 border-blue-500 bg-blue-50 rounded-lg text-sm font-semibold text-blue-900 focus:ring-2 focus:ring-blue-600">
-                    <option value="" disabled selected>-- Pilih Kategori Utility --</option>
-                    <option value="AIR">💧 AIR TENANT</option>
-                    <option value="AIR EATERIA">💧 AIR EATERIA</option>
-                    <option value="LISTRIK TENANT">⚡ LISTRIK TENANT</option>
-                    <option value="LISTRIK EATERIA">⚡ LISTRIK EATERIA</option>
-                    <option value="LISTRIK STORAGE">⚡ LISTRIK STORAGE</option>
-                </select>
-            </div>
-
-            <!-- STEP 2: TENANT -->
-            <div id="sectionTenant" class="border-b pb-4 opacity-50 pointer-events-none transition-all">
-                <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    2. Pilih Tenant / Lokasi
-                </h2>
-
-                <div class="space-y-3">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
-                        <input type="text" id="tenantSearchInput" autocomplete="off" placeholder="Ketik nama tenant / No Lot..."
-                               class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-
-                    <div class="border border-gray-300 rounded-lg max-h-48 overflow-y-auto bg-white divide-y divide-gray-100" id="tenantListBox">
-                        <div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>
-                    </div>
-                </div>
-
+        <!-- FORM PENCATATAN -->
+        <div class="bg-white p-5 rounded-b-2xl shadow-lg space-y-4">
+            <form id="utilityForm" class="space-y-4">
                 <input type="hidden" id="editingRowIndex" value="">
-                <input type="hidden" id="namaTenant" required>
-                <input type="hidden" id="noLot">
 
-                <div id="lotDropdownContainer" class="hidden mt-3">
-                    <label class="block text-xs font-semibold text-blue-700 mb-1">Pilih No Lot / Lokasi Spesifik:</label>
-                    <select id="lotSelectDropdown" class="w-full px-3 py-2 border border-blue-500 bg-blue-50 rounded-md text-sm font-semibold text-blue-900"></select>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Kategori Sheet</label>
+                    <select id="kategoriSheet" class="w-full border rounded-lg p-2 text-sm">
+                        <option value="ELECTRICITY">ELECTRICITY</option>
+                        <option value="WATER">WATER</option>
+                        <option value="GAS">GAS</option>
+                    </select>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Serial Number (SN)</label>
-                        <input type="text" id="serialNumber" placeholder="Ketik SN..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Zona / Area</label>
-                        <input type="text" id="zona" placeholder="Ketik Zona..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Tenant / Lokasi</label>
+                    <input type="text" id="namaTenant" class="w-full border rounded-lg p-2 text-sm" placeholder="Contoh: Tenant A" required>
                 </div>
-            </div>
 
-            <!-- STEP 3: DATA PENCATATAN & FOTO -->
-            <div class="border-b pb-4">
-                <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    3. Data Pencatatan & Foto
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Utility <span class="text-red-500">*</span></label>
-                        <input type="text" id="jenisPencatatan" readonly class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm font-bold text-gray-700">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">No Lot</label>
+                        <input type="text" id="noLot" class="w-full border rounded-lg p-2 text-sm" placeholder="Lot-01">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Angka Meteran <span class="text-red-500">*</span></label>
-                        <input type="number" id="angka" step="0.0001" min="0" required placeholder="0000.0000" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Serial Number</label>
+                        <input type="text" id="serialNumber" class="w-full border rounded-lg p-2 text-sm" placeholder="SN123456">
                     </div>
                 </div>
 
-                <!-- AMBIL FOTO / UPLOAD FOTO -->
-                <div class="mt-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-2">Foto Dokumentasi Meteran <span class="text-red-500">*</span></label>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
-                        <button type="button" id="btnBukaKamera" class="py-2.5 bg-blue-50 border border-blue-300 rounded-lg text-xs font-semibold text-blue-700 flex items-center justify-center gap-2 hover:bg-blue-100">
-                            📷 Buka Kamera
-                        </button>
-
-                        <input type="file" id="galleryInput" accept="image/*" class="hidden">
-                        <button type="button" id="btnUploadFoto" class="py-2.5 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-semibold text-emerald-700 flex items-center justify-center gap-2 hover:bg-emerald-100">
-                            📁 Upload dari Galeri
-                        </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Zona</label>
+                        <input type="text" id="zona" class="w-full border rounded-lg p-2 text-sm" placeholder="Lantai 1">
                     </div>
-
-                    <!-- PREVIEW FOTO WATERMARK -->
-                    <div id="photoPreviewContainer" class="hidden mt-3 relative">
-                        <img id="photoPreview" class="w-full h-auto max-h-80 object-contain rounded-lg border shadow-sm" alt="Preview foto watermark">
-                        <button type="button" id="btnHapusFoto" class="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full shadow hover:bg-red-700">✕</button>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Pencatatan</label>
+                        <select id="jenisPencatatan" class="w-full border rounded-lg p-2 text-sm">
+                            <option value="Awal Bulan">Awal Bulan</option>
+                            <option value="Akhir Bulan">Akhir Bulan</option>
+                            <option value="Harian">Harian</option>
+                        </select>
                     </div>
                 </div>
-            </div>
 
-            <!-- STEP 4: TANDA TANGAN & NAMA -->
-            <div class="space-y-4">
-                <h2 class="text-base font-semibold text-gray-800 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    4. Verifikasi Tanda Tangan
-                </h2>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Angka Stand Meter</label>
+                    <input type="number" step="any" id="angka" class="w-full border rounded-lg p-2 text-sm font-mono" placeholder="0000.00" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Teknisi</label>
+                    <input type="text" id="namaTeknisi" class="w-full border rounded-lg p-2 text-sm" placeholder="Nama petugas" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penandatangan Tenant</label>
+                    <input type="text" id="namaPenandatanganTenant" class="w-full border rounded-lg p-2 text-sm" placeholder="Nama wakil tenant" required>
+                </div>
+
+                <!-- AMBIL FOTO -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Foto Meteran (Watermark Auto)</label>
+                    <input type="file" id="fotoInput" accept="image/*" capture="environment" class="w-full text-xs text-gray-500 border rounded-lg p-1">
+                    <div id="fotoPreviewContainer" class="mt-2 hidden">
+                        <img id="fotoPreview" class="w-full h-40 object-cover rounded-lg border">
+                    </div>
+                </div>
+
+                <!-- TANDA TANGAN TEKNISI -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-medium text-gray-700">Tanda Tangan Teknisi *</label>
-                        <button type="button" id="btnHapusPadTeknisi" class="text-xs text-red-600 hover:underline">Hapus TTD</button>
+                        <label class="text-xs font-bold text-gray-700">TTD Teknisi</label>
+                        <button type="button" onclick="padTeknisi.clear()" class="text-[10px] text-red-500 underline">Clear</button>
                     </div>
-                    <div class="canvas-container"><canvas id="teknisiCanvas"></canvas></div>
-                    <input type="text" id="namaTeknisi" required placeholder="Nama Lengkap Teknisi" class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md text-xs">
+                    <canvas id="canvasTeknisi" class="w-full h-24 border rounded-lg bg-gray-50"></canvas>
                 </div>
+
+                <!-- TANDA TANGAN TENANT -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-medium text-gray-700">Tanda Tangan Tenant *</label>
-                        <button type="button" id="btnHapusPadTenant" class="text-xs text-red-600 hover:underline">Hapus TTD</button>
+                        <label class="text-xs font-bold text-gray-700">TTD Tenant</label>
+                        <button type="button" onclick="padTenant.clear()" class="text-[10px] text-red-500 underline">Clear</button>
                     </div>
-                    <div class="canvas-container"><canvas id="tenantCanvas"></canvas></div>
-                    <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Lengkap Penandatangan (Tenant)" class="w-full mt-2 px-3 py-1.5 border border-gray-300 rounded-md text-xs">
+                    <canvas id="canvasTenant" class="w-full h-24 border rounded-lg bg-gray-50"></canvas>
                 </div>
+
+                <!-- NOTIFIKASI MODE EDIT -->
+                <div id="editModeNotice" class="hidden bg-amber-100 text-amber-800 p-2 rounded text-xs flex justify-between items-center">
+                    <span>Sedang dalam Mode Edit Data</span>
+                    <button type="button" onclick="cancelEditMode()" class="font-bold underline text-red-600">Batal Edit</button>
+                </div>
+
+                <!-- TOMBOL SUBMIT -->
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">
+                    Kirim Data Pencatatan
+                </button>
+            </form>
+        </div>
+
+        <!-- RIWAYAT PENCATATAN LOGSET -->
+        <div class="bg-white mt-6 p-4 rounded-2xl shadow-lg">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold text-gray-800 text-sm flex items-center gap-1">
+                    📋 Riwayat LOGSET (Terakhir)
+                </h2>
+                <button type="button" onclick="fetchHistory()" class="text-xs text-blue-600 font-semibold hover:underline">🔄 Refresh</button>
             </div>
-
-            <button type="submit" id="submitBtn" class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">
-                Kirim Data Pencatatan
-            </button>
-        </form>
-
-        <!-- RIWAYAT -->
-        <section class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center justify-between">
-                <span>📋 Riwayat LOGSET (Terakhir)</span>
-                <button id="btnRefreshHistory" type="button" class="text-xs text-blue-600 hover:underline">🔄 Refresh</button>
-            </h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-gray-600 border-collapse">
-                    <thead class="bg-gray-50 text-gray-700 border-b">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-gray-100 text-gray-600">
                         <tr>
                             <th class="p-2">Kategori & Tenant</th>
                             <th class="p-2">Jenis</th>
@@ -168,400 +136,260 @@
                             <th class="p-2 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="historyTableBody" class="divide-y">
-                        <tr><td colspan="4" class="p-3 text-center text-gray-400">Memuat riwayat...</td></tr>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="4" class="p-3 text-center text-gray-400">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
+    </div>
 
-    </main>
+    <!-- MODAL UCAPAN TERIMA KASIH -->
+    <div id="thankYouModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center transform transition-all border border-gray-100">
+            <!-- Foto Profil / Icon Success -->
+            <div class="relative w-32 h-32 mx-auto mb-4">
+                <img src="./foto rico.png" alt="Rico" class="w-full h-full object-cover rounded-full shadow-lg border-4 border-blue-500">
+                <div class="absolute bottom-0 right-0 bg-green-500 text-white p-1.5 rounded-full border-2 border-white shadow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-800 mb-1">Terima Kasih!</h3>
+            <p class="text-xs text-gray-500 mb-6">Data pencatatan meteran berhasil tersimpan ke sistem LOGSET.</p>
+            
+            <button type="button" id="btnIsiBaru" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Isi Baru Data Pencatatan
+            </button>
+        </div>
+    </div>
 
     <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
+        // GANTI URL DI BAWAH INI DENGAN WEB APP URL GOOGLE APPS SCRIPT ANDA
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec";
 
-    let rawMasterTenants = [];
-    let groupedTenants = {}; 
-    let historyList = [];
-    let selectedTenantGroup = null;
-    let padTeknisi, padTenant;
+        let padTeknisi, padTenant;
+        let fotoBase64WithWatermark = "";
+        let historyList = [];
 
-    // VARIABEL FOTO
-    let rawImageFile = null;
-    let fotoBase64WithWatermark = '';
+        function cleanName(name) {
+            return name ? name.toString().trim() : "";
+        }
 
-    function cleanName(name) {
-        if (!name) return '';
-        return String(name).replace(/^\d+[\s\-\.\)]*/, '').trim();
-    }
-
-    function resizeCanvas(canvas) {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
-    }
-
-    async function fetchMasterByCategory(category) {
-        const box = document.getElementById('tenantListBox');
-        box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
-        
-        try {
-            // PERBAIKAN 1: Menggunakan parameter 'sheet' agar sesuai dengan Code.gs
-            const res = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(category)}`);
-            const jsonResponse = await res.json();
+        window.onload = function() {
+            // Inisialisasi Tanda Tangan
+            const canvas1 = document.getElementById('canvasTeknisi');
+            const canvas2 = document.getElementById('canvasTenant');
             
-            if (jsonResponse.status === "ERROR") {
-                throw new Error(jsonResponse.message);
-            }
+            padTeknisi = new SignaturePad(canvas1);
+            padTenant = new SignaturePad(canvas2);
 
-            rawMasterTenants = jsonResponse.data || [];
-            groupedTenants = {};
-
-            rawMasterTenants.forEach((t) => {
-                // PERBAIKAN 2: Menggunakan key header yang sesuai dengan Google Sheet Anda
-                const namaValue = t["NAMA TENANT"] || "";
-                const lokasiValue = t["LOKASI"] || "";
-                const snValue = t["SN Meter"] || t["SN"] || "";
-                const zonaValue = t["ZONA"] || "";
-
-                let displayName = cleanName(namaValue);
-                if (!displayName) displayName = lokasiValue || 'Tanpa Nama';
-
-                if (!groupedTenants[displayName]) {
-                    groupedTenants[displayName] = { displayName: displayName, items: [] };
-                }
-                groupedTenants[displayName].items.push({
-                    namaAsli: namaValue,
-                    lokasi: lokasiValue,
-                    sn: snValue,
-                    zona: zonaValue
+            function resizeCanvas() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                [canvas1, canvas2].forEach(canvas => {
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext("2d").scale(ratio, ratio);
                 });
-            });
+                padTeknisi.clear();
+                padTenant.clear();
+            }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
 
-            renderTenantList('');
-        } catch (err) {
-            box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}: ${err.message}</div>`;
-        }
-    }
+            fetchHistory();
+        };
 
-    function renderTenantList(filterKeyword = '') {
-        const box = document.getElementById('tenantListBox');
-        box.innerHTML = '';
+        // HANDLER PENGOLAHAN FOTO DENGAN WATERMARK
+        document.getElementById('fotoInput').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        const keys = Object.keys(groupedTenants);
-        const filtered = keys.filter(nameKey => {
-            const grp = groupedTenants[nameKey];
-            const matchName = nameKey.toLowerCase().includes(filterKeyword.toLowerCase());
-            const matchSub = grp.items.some(it => `${it.lokasi} ${it.sn} ${it.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
-            return matchName || matchSub;
-        });
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
 
-        if (filtered.length === 0) {
-            box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada data tenant di sheet ini</div>`;
-            return;
-        }
+                    // Draw Original Image
+                    ctx.drawImage(img, 0, 0);
 
-        filtered.forEach((key) => {
-            const group = groupedTenants[key];
-            const isSelected = selectedTenantGroup && selectedTenantGroup.displayName === key;
-            const row = document.createElement('div');
-            row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
-            
-            const countItems = group.items.length;
-            const badgeInfo = countItems > 1 ? `<span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">${countItems} Lot</span>` : '';
+                    // Watermark Setting
+                    const now = new Date();
+                    const timeStr = now.toLocaleString('id-ID');
+                    const text = `LOGSET | ${timeStr}`;
 
-            row.innerHTML = `
-                <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
-                <div class="text-sm flex items-center justify-between w-full">
-                    <span class="font-bold text-gray-800">${group.displayName}</span>
-                    ${badgeInfo}
-                </div>
-            `;
-            row.onclick = () => selectTenantGroup(group);
-            box.appendChild(row);
-        });
-    }
+                    const fontSize = Math.max(16, Math.floor(canvas.width / 25));
+                    ctx.font = `bold ${fontSize}px sans-serif`;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.shadowColor = 'black';
+                    ctx.shadowBlur = 6;
+                    
+                    ctx.fillText(text, 20, canvas.height - 30);
 
-    function selectTenantGroup(group) {
-        selectedTenantGroup = group;
-        const dropdownContainer = document.getElementById('lotDropdownContainer');
-        const selectDropdown = document.getElementById('lotSelectDropdown');
+                    fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // Display Preview
+                    document.getElementById('fotoPreview').src = fotoBase64WithWatermark;
+                    document.getElementById('fotoPreviewContainer').classList.remove('hidden');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
 
-        if (group.items.length > 1) {
-            dropdownContainer.classList.remove('hidden');
-            selectDropdown.innerHTML = group.items.map((item, idx) => {
-                return `<option value="${idx}">Lot: ${item.lokasi || '-'} | SN: ${item.sn || '-'}</option>`;
-            }).join('');
-            selectDropdown.onchange = () => applySubItemSelection(group.items[selectDropdown.value]);
-            applySubItemSelection(group.items[0]);
-        } else if (group.items.length === 1) {
-            dropdownContainer.classList.add('hidden');
-            applySubItemSelection(group.items[0]);
-        }
+        // MEMUAT RIWAYAT DENGAN PENANGANAN DATA HEADER
+        async function fetchHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
+                const jsonRes = await res.json();
+                historyList = jsonRes.data || [];
 
-        renderTenantList(document.getElementById('tenantSearchInput').value);
-    }
-
-    function applySubItemSelection(item) {
-        document.getElementById('namaTenant').value = item.namaAsli || item.lokasi;
-        document.getElementById('noLot').value = item.lokasi || '';
-        document.getElementById('serialNumber').value = item.sn || '';
-        document.getElementById('zona').value = item.zona || '';
-        updatePhotoWatermark();
-    }
-
-    function updatePhotoWatermark() {
-        if (!rawImageFile) return;
-
-        const namaTenant = document.getElementById('namaTenant').value || '-';
-        const namaPenandatangan = document.getElementById('namaPenandatanganTenant').value || '-';
-        const namaTeknisi = document.getElementById('namaTeknisi').value || '-';
-        const serialNumber = document.getElementById('serialNumber').value || '-';
-
-        const now = new Date();
-        const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
-                           now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                const MAX_DIMENSION = 1280;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > MAX_DIMENSION) {
-                        height *= MAX_DIMENSION / width;
-                        width = MAX_DIMENSION;
-                    }
-                } else {
-                    if (height > MAX_DIMENSION) {
-                        width *= MAX_DIMENSION / height;
-                        height = MAX_DIMENSION;
-                    }
+                tbody.innerHTML = '';
+                if (historyList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
+                    return;
                 }
 
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
+                historyList.forEach((item, index) => {
+                    // Penanganan fallback key JSON dari Google Sheet
+                    const rawNama = item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant || "";
+                    const rawKategori = item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "-";
+                    const rawLot = item["NO LOT"] || item["No Lot"] || item.noLot || "-";
+                    const rawSn = item["SERIAL NUMBER"] || item["SN"] || item.serialNumber || item.sn || "-";
+                    const rawJenis = item["JENIS PENCATATAN"] || item["Jenis Pencatatan"] || item.jenisPencatatan || item.jenis || "-";
+                    const rawAngka = item["ANGKA"] || item["Angka"] || item.angka || "-";
 
-                const fontSize = Math.max(14, Math.floor(canvas.width / 35));
-                ctx.font = `bold ${fontSize}px sans-serif`;
+                    const cleanNamaDisplay = cleanName(rawNama) || rawLot || "Tanpa Nama";
 
-                const line1 = `${namaTenant} (${namaPenandatangan})`;
-                const line2 = `${timeString} (${namaTeknisi})`;
-                const line3 = `SN: ${serialNumber}`;
-
-                const padding = fontSize * 0.8;
-                const lineHeight = fontSize * 1.35;
-                const boxHeight = (lineHeight * 3) + (padding * 2);
-                const boxWidth = Math.max(
-                    ctx.measureText(line1).width,
-                    ctx.measureText(line2).width,
-                    ctx.measureText(line3).width
-                ) + (padding * 2);
-
-                const x = padding;
-                const y = canvas.height - boxHeight - padding;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(x, y, boxWidth, boxHeight);
-
-                ctx.textBaseline = 'top';
-                ctx.fillStyle = '#fde047';
-                ctx.fillText(line1, x + padding, y + padding);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(line2, x + padding, y + padding + lineHeight);
-
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillText(line3, x + padding, y + padding + (lineHeight * 2));
-
-                fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.75);
-                document.getElementById('photoPreview').src = fotoBase64WithWatermark;
-                document.getElementById('photoPreviewContainer').classList.remove('hidden');
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(rawImageFile);
-    }
-
-    async function fetchHistory() {
-    const tbody = document.getElementById('historyTableBody');
-    try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
-        const jsonRes = await res.json();
-        historyList = jsonRes.data || [];
-
-        tbody.innerHTML = '';
-        if (historyList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
-            return;
-        }
-
-        historyList.forEach((item, index) => {
-            // MENANGANI KEMUNGKINAN NAMA HEADER DARI GOOGLE SHEET / JSON
-            const rawNama = item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant || item["namaTenant"] || "";
-            const rawKategori = item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || item["kategoriSheet"] || "-";
-            const rawLot = item["NO LOT"] || item["No Lot"] || item.noLot || item["noLot"] || "-";
-            const rawSn = item["SERIAL NUMBER"] || item["SN"] || item.serialNumber || item.sn || "-";
-            const rawJenis = item["JENIS PENCATATAN"] || item["Jenis Pencatatan"] || item.jenisPencatatan || item.jenis || "-";
-            const rawAngka = item["ANGKA"] || item["Angka"] || item.angka || "-";
-
-            const cleanNamaDisplay = cleanName(rawNama) || rawLot || "Tanpa Nama";
-
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-gray-50';
-            tr.innerHTML = `
-                <td class="p-2">
-                    <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${rawKategori}</span>
-                    <div class="font-bold text-gray-800 mt-1">${cleanNamaDisplay}</div>
-                    <div class="text-[10px] text-gray-500">Lot: ${rawLot} | SN: ${rawSn}</div>
-                </td>
-                <td class="p-2 font-semibold">${rawJenis}</td>
-                <td class="p-2 font-mono font-bold text-blue-600">${rawAngka}</td>
-                <td class="p-2 text-center">
-                    <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
-    }
-}
-
-    function cancelEditMode() {
-        document.getElementById('editingRowIndex').value = '';
-        document.getElementById('editNotice').classList.add('hidden');
-        document.getElementById('utilityForm').reset();
-        document.getElementById('sectionTenant').classList.add('opacity-50', 'pointer-events-none');
-        document.getElementById('lotDropdownContainer').classList.add('hidden');
-        selectedTenantGroup = null;
-        rawImageFile = null;
-        fotoBase64WithWatermark = '';
-        document.getElementById('photoPreviewContainer').classList.add('hidden');
-        document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>`;
-
-        document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
-        document.getElementById('submitBtn').className = 'w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700';
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        fetchHistory();
-
-        document.getElementById('btnRefreshHistory').onclick = fetchHistory;
-        document.getElementById('btnCancelEdit').onclick = cancelEditMode;
-        document.getElementById('tenantSearchInput').addEventListener('input', (e) => renderTenantList(e.target.value));
-
-        document.getElementById('namaTeknisi').addEventListener('input', updatePhotoWatermark);
-        document.getElementById('namaPenandatanganTenant').addEventListener('input', updatePhotoWatermark);
-        document.getElementById('serialNumber').addEventListener('input', updatePhotoWatermark);
-
-        document.getElementById('kategoriSheet').addEventListener('change', (e) => {
-            let category = e.target.value;
-            const sectionTenant = document.getElementById('sectionTenant');
-            const jenisInput = document.getElementById('jenisPencatatan');
-
-            if (category) {
-                sectionTenant.classList.remove('opacity-50', 'pointer-events-none');
-                jenisInput.value = category.startsWith('AIR') ? 'Air (m³)' : 'Listrik (kWh)';
-                selectedTenantGroup = null;
-                fetchMasterByCategory(category);
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50';
+                    tr.innerHTML = `
+                        <td class="p-2">
+                            <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${rawKategori}</span>
+                            <div class="font-bold text-gray-800 mt-1">${cleanNamaDisplay}</div>
+                            <div class="text-[10px] text-gray-500">Lot: ${rawLot} | SN: ${rawSn}</div>
+                        </td>
+                        <td class="p-2 font-semibold">${rawJenis}</td>
+                        <td class="p-2 font-mono font-bold text-blue-600">${rawAngka}</td>
+                        <td class="p-2 text-center">
+                            <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
             }
-        });
-
-        document.getElementById('btnBukaKamera').onclick = () => document.getElementById('cameraInput').click();
-        document.getElementById('btnUploadFoto').onclick = () => document.getElementById('galleryInput').click();
-
-        const handleFileSelect = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                rawImageFile = file;
-                updatePhotoWatermark();
-            }
-        };
-
-        document.getElementById('cameraInput').onchange = handleFileSelect;
-        document.getElementById('galleryInput').onchange = handleFileSelect;
-
-        document.getElementById('btnHapusFoto').onclick = () => {
-            rawImageFile = null;
-            fotoBase64WithWatermark = '';
-            document.getElementById('cameraInput').value = '';
-            document.getElementById('galleryInput').value = '';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-        };
-
-        const canvasTeknisi = document.getElementById('teknisiCanvas');
-        const canvasTenant = document.getElementById('tenantCanvas');
-        resizeCanvas(canvasTeknisi);
-        resizeCanvas(canvasTenant);
-
-        padTeknisi = new SignaturePad(canvasTeknisi, { backgroundColor: 'rgb(255, 255, 255)' });
-        padTenant = new SignaturePad(canvasTenant, { backgroundColor: 'rgb(255, 255, 255)' });
-
-        document.getElementById('btnHapusPadTeknisi').onclick = () => padTeknisi.clear();
-        document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
-    });
-
-    document.getElementById('utilityForm').onsubmit = async function(e) {
-        e.preventDefault();
-        const editingRowIndex = document.getElementById('editingRowIndex').value;
-
-        if (!document.getElementById('namaTenant').value) {
-            return alert('Pilih salah satu Tenant / Lokasi!');
         }
-        if (!fotoBase64WithWatermark) {
-            return alert('Foto meteran wajib diambil/diupload!');
+
+        // FUNGSI UNTUK MENAMPILKAN MODAL TERIMA KASIH
+        function showThankYouModal() {
+            document.getElementById('thankYouModal').classList.remove('hidden');
         }
-        if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
-        if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
 
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Mengirim Data...';
-
-        const payload = {
-            action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
-            rowIndex: editingRowIndex || null,
-            kategoriSheet: document.getElementById('kategoriSheet').value,
-            namaTenant: cleanName(document.getElementById('namaTenant').value),
-            noLot: document.getElementById('noLot').value,
-            serialNumber: document.getElementById('serialNumber').value,
-            zona: document.getElementById('zona').value,
-            jenisPencatatan: document.getElementById('jenisPencatatan').value,
-            angka: parseFloat(document.getElementById('angka').value).toFixed(4),
-            namaTeknisi: document.getElementById('namaTeknisi').value,
-            namaPenandatanganTenant: document.getElementById('namaPenandatanganTenant').value,
-            foto: fotoBase64WithWatermark,
-            ttdTeknisi: padTeknisi.toDataURL(),
-            ttdTenant: padTenant.toDataURL()
-        };
-
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            alert('Data pencatatan berhasil disimpan!');
+        // FUNGSI UNTUK RESET FORM DAN SIAP ISI BARU
+        function resetAndPrepareNewForm() {
+            document.getElementById('thankYouModal').classList.add('hidden');
+            document.getElementById('utilityForm').reset();
             cancelEditMode();
             padTeknisi.clear();
             padTenant.clear();
-            setTimeout(fetchHistory, 1500);
-        } catch (err) {
-            alert('Gagal mengirim data: ' + err.message);
-        } finally {
-            submitBtn.disabled = false;
+            fotoBase64WithWatermark = "";
+            document.getElementById('fotoPreviewContainer').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    };
-</script>
+
+        // EVENT LISTENER TOMBOL ISI BARU
+        document.getElementById('btnIsiBaru').onclick = resetAndPrepareNewForm;
+
+        // EDIT MODE
+        function editHistoryItem(index) {
+            const item = historyList[index];
+            if (!item) return;
+
+            document.getElementById('editingRowIndex').value = index + 2; // +2 untuk baris sheet (karena header row 1)
+            document.getElementById('kategoriSheet').value = item["KATEGORI SHEET"] || item.kategoriSheet || "ELECTRICITY";
+            document.getElementById('namaTenant').value = item["NAMA TENANT"] || item.namaTenant || "";
+            document.getElementById('noLot').value = item["NO LOT"] || item.noLot || "";
+            document.getElementById('serialNumber').value = item["SERIAL NUMBER"] || item.serialNumber || "";
+            document.getElementById('zona').value = item["ZONA"] || item.zona || "";
+            document.getElementById('jenisPencatatan').value = item["JENIS PENCATATAN"] || item.jenisPencatatan || "Awal Bulan";
+            document.getElementById('angka').value = item["ANGKA"] || item.angka || "";
+            document.getElementById('namaTeknisi').value = item["NAMA TEKNISI"] || item.namaTeknisi || "";
+            document.getElementById('namaPenandatanganTenant').value = item["NAMA TENANT PENANDATANGAN"] || item.namaPenandatanganTenant || "";
+
+            document.getElementById('editModeNotice').classList.remove('hidden');
+            document.getElementById('submitBtn').innerText = 'Update Data Pencatatan';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditMode() {
+            document.getElementById('editingRowIndex').value = '';
+            document.getElementById('editModeNotice').classList.add('hidden');
+            document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
+        }
+
+        // FORM SUBMIT
+        document.getElementById('utilityForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const editingRowIndex = document.getElementById('editingRowIndex').value;
+
+            if (!document.getElementById('namaTenant').value) return alert('Pilih/Isi Nama Tenant!');
+            if (!editingRowIndex && !fotoBase64WithWatermark) return alert('Foto meteran wajib diambil!');
+            if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
+            if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Mengirim Data...';
+
+            const payload = {
+                action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
+                rowIndex: editingRowIndex || null,
+                kategoriSheet: document.getElementById('kategoriSheet').value,
+                namaTenant: cleanName(document.getElementById('namaTenant').value),
+                noLot: document.getElementById('noLot').value,
+                serialNumber: document.getElementById('serialNumber').value,
+                zona: document.getElementById('zona').value,
+                jenisPencatatan: document.getElementById('jenisPencatatan').value,
+                angka: parseFloat(document.getElementById('angka').value).toFixed(4),
+                namaTeknisi: document.getElementById('namaTeknisi').value,
+                namaPenandatanganTenant: document.getElementById('namaPenandatanganTenant').value,
+                foto: fotoBase64WithWatermark,
+                ttdTeknisi: padTeknisi.toDataURL(),
+                ttdTenant: padTenant.toDataURL()
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                // Tampilkan popup ucapan terima kasih
+                showThankYouModal();
+                fetchHistory();
+            } catch (err) {
+                alert('Gagal mengirim data: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = editingRowIndex ? 'Update Data Pencatatan' : 'Kirim Data Pencatatan';
+            }
+        };
+    </script>
 </body>
 </html>
