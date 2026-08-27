@@ -178,369 +178,381 @@
     </main>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIZRUVgCOfgzC9YhrQd-VlEexaZExoBGxy4gUMULoPxlJiwp3oFlM10O0NNt_05-s0bQ/exec';
 
-        let rawMasterTenants = [];
-        let groupedTenants = {}; 
-        let historyList = [];
-        let selectedTenantGroup = null;
-        let padTeknisi, padTenant;
+    let rawMasterTenants = [];
+    let groupedTenants = {}; 
+    let historyList = [];
+    let selectedTenantGroup = null;
+    let padTeknisi, padTenant;
 
-        // VARIABEL FOTO
-        let rawImageFile = null;
-        let fotoBase64WithWatermark = '';
+    // VARIABEL FOTO
+    let rawImageFile = null;
+    let fotoBase64WithWatermark = '';
 
-        function cleanName(name) {
-            if (!name) return '';
-            return String(name).replace(/^\d+[\s\-\.\)]*/, '').trim();
-        }
+    function cleanName(name) {
+        if (!name) return '';
+        return String(name).replace(/^\d+[\s\-\.\)]*/, '').trim();
+    }
 
-        function resizeCanvas(canvas) {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext("2d").scale(ratio, ratio);
-        }
+    function resizeCanvas(canvas) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+    }
 
-        async function fetchMasterByCategory(category) {
-            const box = document.getElementById('tenantListBox');
-            box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
+    async function fetchMasterByCategory(category) {
+        const box = document.getElementById('tenantListBox');
+        box.innerHTML = `<div class="p-3 text-center text-xs text-blue-500 font-semibold">Memuat data dari sheet ${category}...</div>`;
+        
+        try {
+            // PERBAIKAN 1: Menggunakan parameter 'sheet' agar sesuai dengan Code.gs
+            const res = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(category)}`);
+            const jsonResponse = await res.json();
             
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=GET_MASTER_BY_CATEGORY&category=${encodeURIComponent(category)}`);
-                rawMasterTenants = await res.json();
-                
-                groupedTenants = {};
-                rawMasterTenants.forEach((t) => {
-                    let displayName = cleanName(t.nama);
-                    if (!displayName) displayName = t.lokasi || 'Tanpa Nama';
-
-                    if (!groupedTenants[displayName]) {
-                        groupedTenants[displayName] = { displayName: displayName, items: [] };
-                    }
-                    groupedTenants[displayName].items.push({
-                        namaAsli: t.nama || '',
-                        lokasi: t.lokasi || '',
-                        sn: t.sn || '',
-                        zona: t.zona || ''
-                    });
-                });
-
-                renderTenantList('');
-            } catch (err) {
-                box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}</div>`;
+            if (jsonResponse.status === "ERROR") {
+                throw new Error(jsonResponse.message);
             }
-        }
 
-        function renderTenantList(filterKeyword = '') {
-            const box = document.getElementById('tenantListBox');
-            box.innerHTML = '';
+            rawMasterTenants = jsonResponse.data || [];
+            groupedTenants = {};
 
-            const keys = Object.keys(groupedTenants);
-            const filtered = keys.filter(nameKey => {
-                const grp = groupedTenants[nameKey];
-                const matchName = nameKey.toLowerCase().includes(filterKeyword.toLowerCase());
-                const matchSub = grp.items.some(it => `${it.lokasi} ${it.sn} ${it.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
-                return matchName || matchSub;
+            rawMasterTenants.forEach((t) => {
+                // PERBAIKAN 2: Menggunakan key header yang sesuai dengan Google Sheet Anda
+                const namaValue = t["NAMA TENANT"] || "";
+                const lokasiValue = t["LOKASI"] || "";
+                const snValue = t["SN Meter"] || t["SN"] || "";
+                const zonaValue = t["ZONA"] || "";
+
+                let displayName = cleanName(namaValue);
+                if (!displayName) displayName = lokasiValue || 'Tanpa Nama';
+
+                if (!groupedTenants[displayName]) {
+                    groupedTenants[displayName] = { displayName: displayName, items: [] };
+                }
+                groupedTenants[displayName].items.push({
+                    namaAsli: namaValue,
+                    lokasi: lokasiValue,
+                    sn: snValue,
+                    zona: zonaValue
+                });
             });
 
-            if (filtered.length === 0) {
-                box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada data tenant di sheet ini</div>`;
+            renderTenantList('');
+        } catch (err) {
+            box.innerHTML = `<div class="p-3 text-center text-xs text-red-500">Gagal memuat master data sheet ${category}: ${err.message}</div>`;
+        }
+    }
+
+    function renderTenantList(filterKeyword = '') {
+        const box = document.getElementById('tenantListBox');
+        box.innerHTML = '';
+
+        const keys = Object.keys(groupedTenants);
+        const filtered = keys.filter(nameKey => {
+            const grp = groupedTenants[nameKey];
+            const matchName = nameKey.toLowerCase().includes(filterKeyword.toLowerCase());
+            const matchSub = grp.items.some(it => `${it.lokasi} ${it.sn} ${it.zona}`.toLowerCase().includes(filterKeyword.toLowerCase()));
+            return matchName || matchSub;
+        });
+
+        if (filtered.length === 0) {
+            box.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Tidak ada data tenant di sheet ini</div>`;
+            return;
+        }
+
+        filtered.forEach((key) => {
+            const group = groupedTenants[key];
+            const isSelected = selectedTenantGroup && selectedTenantGroup.displayName === key;
+            const row = document.createElement('div');
+            row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
+            
+            const countItems = group.items.length;
+            const badgeInfo = countItems > 1 ? `<span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">${countItems} Lot</span>` : '';
+
+            row.innerHTML = `
+                <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
+                <div class="text-sm flex items-center justify-between w-full">
+                    <span class="font-bold text-gray-800">${group.displayName}</span>
+                    ${badgeInfo}
+                </div>
+            `;
+            row.onclick = () => selectTenantGroup(group);
+            box.appendChild(row);
+        });
+    }
+
+    function selectTenantGroup(group) {
+        selectedTenantGroup = group;
+        const dropdownContainer = document.getElementById('lotDropdownContainer');
+        const selectDropdown = document.getElementById('lotSelectDropdown');
+
+        if (group.items.length > 1) {
+            dropdownContainer.classList.remove('hidden');
+            selectDropdown.innerHTML = group.items.map((item, idx) => {
+                return `<option value="${idx}">Lot: ${item.lokasi || '-'} | SN: ${item.sn || '-'}</option>`;
+            }).join('');
+            selectDropdown.onchange = () => applySubItemSelection(group.items[selectDropdown.value]);
+            applySubItemSelection(group.items[0]);
+        } else if (group.items.length === 1) {
+            dropdownContainer.classList.add('hidden');
+            applySubItemSelection(group.items[0]);
+        }
+
+        renderTenantList(document.getElementById('tenantSearchInput').value);
+    }
+
+    function applySubItemSelection(item) {
+        document.getElementById('namaTenant').value = item.namaAsli || item.lokasi;
+        document.getElementById('noLot').value = item.lokasi || '';
+        document.getElementById('serialNumber').value = item.sn || '';
+        document.getElementById('zona').value = item.zona || '';
+        updatePhotoWatermark();
+    }
+
+    function updatePhotoWatermark() {
+        if (!rawImageFile) return;
+
+        const namaTenant = document.getElementById('namaTenant').value || '-';
+        const namaPenandatangan = document.getElementById('namaPenandatanganTenant').value || '-';
+        const namaTeknisi = document.getElementById('namaTeknisi').value || '-';
+        const serialNumber = document.getElementById('serialNumber').value || '-';
+
+        const now = new Date();
+        const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
+                           now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                const MAX_DIMENSION = 1280;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_DIMENSION) {
+                        height *= MAX_DIMENSION / width;
+                        width = MAX_DIMENSION;
+                    }
+                } else {
+                    if (height > MAX_DIMENSION) {
+                        width *= MAX_DIMENSION / height;
+                        height = MAX_DIMENSION;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const fontSize = Math.max(14, Math.floor(canvas.width / 35));
+                ctx.font = `bold ${fontSize}px sans-serif`;
+
+                const line1 = `${namaTenant} (${namaPenandatangan})`;
+                const line2 = `${timeString} (${namaTeknisi})`;
+                const line3 = `SN: ${serialNumber}`;
+
+                const padding = fontSize * 0.8;
+                const lineHeight = fontSize * 1.35;
+                const boxHeight = (lineHeight * 3) + (padding * 2);
+                const boxWidth = Math.max(
+                    ctx.measureText(line1).width,
+                    ctx.measureText(line2).width,
+                    ctx.measureText(line3).width
+                ) + (padding * 2);
+
+                const x = padding;
+                const y = canvas.height - boxHeight - padding;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                ctx.fillRect(x, y, boxWidth, boxHeight);
+
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = '#fde047';
+                ctx.fillText(line1, x + padding, y + padding);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(line2, x + padding, y + padding + lineHeight);
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillText(line3, x + padding, y + padding + (lineHeight * 2));
+
+                fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.75);
+                document.getElementById('photoPreview').src = fotoBase64WithWatermark;
+                document.getElementById('photoPreviewContainer').classList.remove('hidden');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(rawImageFile);
+    }
+
+    async function fetchHistory() {
+        const tbody = document.getElementById('historyTableBody');
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
+            const jsonRes = await res.json();
+            historyList = jsonRes.data || [];
+
+            tbody.innerHTML = '';
+            if (historyList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
                 return;
             }
 
-            filtered.forEach((key) => {
-                const group = groupedTenants[key];
-                const isSelected = selectedTenantGroup && selectedTenantGroup.displayName === key;
-                const row = document.createElement('div');
-                row.className = `p-3 flex items-center gap-3 cursor-pointer transition hover:bg-blue-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`;
-                
-                const countItems = group.items.length;
-                const badgeInfo = countItems > 1 ? `<span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">${countItems} Lot</span>` : '';
-
-                row.innerHTML = `
-                    <input type="radio" name="tenantRadio" class="w-4 h-4 text-blue-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
-                    <div class="text-sm flex items-center justify-between w-full">
-                        <span class="font-bold text-gray-800">${group.displayName}</span>
-                        ${badgeInfo}
-                    </div>
+            historyList.forEach((item, index) => {
+                const cleanNama = cleanName(item["NAMA TENANT"] || item.namaTenant) || item.noLot;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="p-2">
+                        <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${item.kategoriSheet || item["KATEGORI SHEET"] || '-'}</span>
+                        <div class="font-bold text-gray-800 mt-1">${cleanNama}</div>
+                        <div class="text-[10px] text-gray-500">Lot: ${item.noLot || '-'} | SN: ${item.serialNumber || item.sn || '-'}</div>
+                    </td>
+                    <td class="p-2 font-semibold">${item.jenisPencatatan || item.jenis || '-'}</td>
+                    <td class="p-2 font-mono font-bold text-blue-600">${item.angka || '-'}</td>
+                    <td class="p-2 text-center">
+                        <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
+                    </td>
                 `;
-                row.onclick = () => selectTenantGroup(group);
-                box.appendChild(row);
+                tbody.appendChild(tr);
             });
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
         }
+    }
 
-        function selectTenantGroup(group) {
-            selectedTenantGroup = group;
-            const dropdownContainer = document.getElementById('lotDropdownContainer');
-            const selectDropdown = document.getElementById('lotSelectDropdown');
+    function cancelEditMode() {
+        document.getElementById('editingRowIndex').value = '';
+        document.getElementById('editNotice').classList.add('hidden');
+        document.getElementById('utilityForm').reset();
+        document.getElementById('sectionTenant').classList.add('opacity-50', 'pointer-events-none');
+        document.getElementById('lotDropdownContainer').classList.add('hidden');
+        selectedTenantGroup = null;
+        rawImageFile = null;
+        fotoBase64WithWatermark = '';
+        document.getElementById('photoPreviewContainer').classList.add('hidden');
+        document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>`;
 
-            if (group.items.length > 1) {
-                dropdownContainer.classList.remove('hidden');
-                selectDropdown.innerHTML = group.items.map((item, idx) => {
-                    return `<option value="${idx}">Lot: ${item.lokasi || '-'} | SN: ${item.sn || '-'}</option>`;
-                }).join('');
-                selectDropdown.onchange = () => applySubItemSelection(group.items[selectDropdown.value]);
-                applySubItemSelection(group.items[0]);
-            } else if (group.items.length === 1) {
-                dropdownContainer.classList.add('hidden');
-                applySubItemSelection(group.items[0]);
+        document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
+        document.getElementById('submitBtn').className = 'w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchHistory();
+
+        document.getElementById('btnRefreshHistory').onclick = fetchHistory;
+        document.getElementById('btnCancelEdit').onclick = cancelEditMode;
+        document.getElementById('tenantSearchInput').addEventListener('input', (e) => renderTenantList(e.target.value));
+
+        document.getElementById('namaTeknisi').addEventListener('input', updatePhotoWatermark);
+        document.getElementById('namaPenandatanganTenant').addEventListener('input', updatePhotoWatermark);
+        document.getElementById('serialNumber').addEventListener('input', updatePhotoWatermark);
+
+        document.getElementById('kategoriSheet').addEventListener('change', (e) => {
+            let category = e.target.value;
+            const sectionTenant = document.getElementById('sectionTenant');
+            const jenisInput = document.getElementById('jenisPencatatan');
+
+            if (category) {
+                sectionTenant.classList.remove('opacity-50', 'pointer-events-none');
+                jenisInput.value = category.startsWith('AIR') ? 'Air (m³)' : 'Listrik (kWh)';
+                selectedTenantGroup = null;
+                fetchMasterByCategory(category);
             }
-
-            renderTenantList(document.getElementById('tenantSearchInput').value);
-        }
-
-        function applySubItemSelection(item) {
-            document.getElementById('namaTenant').value = item.namaAsli || item.lokasi;
-            document.getElementById('noLot').value = item.lokasi || '';
-            document.getElementById('serialNumber').value = item.sn || '';
-            document.getElementById('zona').value = item.zona || '';
-            updatePhotoWatermark();
-        }
-
-        // FUNGSI UPDATE WATERMARK SECARA REAL-TIME
-        function updatePhotoWatermark() {
-            if (!rawImageFile) return;
-
-            const namaTenant = document.getElementById('namaTenant').value || '-';
-            const namaPenandatangan = document.getElementById('namaPenandatanganTenant').value || '-';
-            const namaTeknisi = document.getElementById('namaTeknisi').value || '-';
-            const serialNumber = document.getElementById('serialNumber').value || '-';
-
-            const now = new Date();
-            const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
-                               now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    const MAX_DIMENSION = 1280;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_DIMENSION) {
-                            height *= MAX_DIMENSION / width;
-                            width = MAX_DIMENSION;
-                        }
-                    } else {
-                        if (height > MAX_DIMENSION) {
-                            width *= MAX_DIMENSION / height;
-                            height = MAX_DIMENSION;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const fontSize = Math.max(14, Math.floor(canvas.width / 35));
-                    ctx.font = `bold ${fontSize}px sans-serif`;
-
-                    const line1 = `${namaTenant} (${namaPenandatangan})`;
-                    const line2 = `${timeString} (${namaTeknisi})`;
-                    const line3 = `SN: ${serialNumber}`;
-
-                    const padding = fontSize * 0.8;
-                    const lineHeight = fontSize * 1.35;
-                    const boxHeight = (lineHeight * 3) + (padding * 2);
-                    const boxWidth = Math.max(
-                        ctx.measureText(line1).width,
-                        ctx.measureText(line2).width,
-                        ctx.measureText(line3).width
-                    ) + (padding * 2);
-
-                    const x = padding;
-                    const y = canvas.height - boxHeight - padding;
-
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                    ctx.fillRect(x, y, boxWidth, boxHeight);
-
-                    ctx.textBaseline = 'top';
-                    ctx.fillStyle = '#fde047'; // Baris 1: Kuning
-                    ctx.fillText(line1, x + padding, y + padding);
-
-                    ctx.fillStyle = '#ffffff'; // Baris 2: Putih
-                    ctx.fillText(line2, x + padding, y + padding + lineHeight);
-
-                    ctx.fillStyle = '#38bdf8'; // Baris 3: Biru
-                    ctx.fillText(line3, x + padding, y + padding + (lineHeight * 2));
-
-                    fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.75);
-                    document.getElementById('photoPreview').src = fotoBase64WithWatermark;
-                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(rawImageFile);
-        }
-
-        async function fetchHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
-                historyList = await res.json();
-
-                tbody.innerHTML = '';
-                if (historyList.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
-                    return;
-                }
-
-                historyList.forEach((item, index) => {
-                    const cleanNama = cleanName(item.namaTenant) || item.noLot;
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50';
-                    tr.innerHTML = `
-                        <td class="p-2">
-                            <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${item.kategoriSheet}</span>
-                            <div class="font-bold text-gray-800 mt-1">${cleanNama}</div>
-                            <div class="text-[10px] text-gray-500">Lot: ${item.noLot || '-'} | SN: ${item.sn || '-'}</div>
-                        </td>
-                        <td class="p-2 font-semibold">${item.jenis}</td>
-                        <td class="p-2 font-mono font-bold text-blue-600">${item.angka}</td>
-                        <td class="p-2 text-center">
-                            <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
-            }
-        }
-
-        function cancelEditMode() {
-            document.getElementById('editingRowIndex').value = '';
-            document.getElementById('editNotice').classList.add('hidden');
-            document.getElementById('utilityForm').reset();
-            document.getElementById('sectionTenant').classList.add('opacity-50', 'pointer-events-none');
-            document.getElementById('lotDropdownContainer').classList.add('hidden');
-            selectedTenantGroup = null;
-            rawImageFile = null;
-            fotoBase64WithWatermark = '';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-            document.getElementById('tenantListBox').innerHTML = `<div class="p-3 text-center text-xs text-gray-400">Pilih kategori utility terlebih dahulu...</div>`;
-
-            document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
-            document.getElementById('submitBtn').className = 'w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchHistory();
-
-            document.getElementById('btnRefreshHistory').onclick = fetchHistory;
-            document.getElementById('btnCancelEdit').onclick = cancelEditMode;
-            document.getElementById('tenantSearchInput').addEventListener('input', (e) => renderTenantList(e.target.value));
-
-            // OTOMATIS UPDATE WATERMARK SAAT NAMA KETIKED
-            document.getElementById('namaTeknisi').addEventListener('input', updatePhotoWatermark);
-            document.getElementById('namaPenandatanganTenant').addEventListener('input', updatePhotoWatermark);
-            document.getElementById('serialNumber').addEventListener('input', updatePhotoWatermark);
-
-            document.getElementById('kategoriSheet').addEventListener('change', (e) => {
-                const category = e.target.value;
-                const sectionTenant = document.getElementById('sectionTenant');
-                const jenisInput = document.getElementById('jenisPencatatan');
-
-                if (category) {
-                    sectionTenant.classList.remove('opacity-50', 'pointer-events-none');
-                    jenisInput.value = category.startsWith('AIR') ? 'Air (m³)' : 'Listrik (kWh)';
-                    selectedTenantGroup = null;
-                    fetchMasterByCategory(category);
-                }
-            });
-
-            document.getElementById('btnBukaKamera').onclick = () => document.getElementById('cameraInput').click();
-            document.getElementById('btnUploadFoto').onclick = () => document.getElementById('galleryInput').click();
-
-            const handleFileSelect = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    rawImageFile = file;
-                    updatePhotoWatermark();
-                }
-            };
-
-            document.getElementById('cameraInput').onchange = handleFileSelect;
-            document.getElementById('galleryInput').onchange = handleFileSelect;
-
-            document.getElementById('btnHapusFoto').onclick = () => {
-                rawImageFile = null;
-                fotoBase64WithWatermark = '';
-                document.getElementById('cameraInput').value = '';
-                document.getElementById('galleryInput').value = '';
-                document.getElementById('photoPreviewContainer').classList.add('hidden');
-            };
-
-            const canvasTeknisi = document.getElementById('teknisiCanvas');
-            const canvasTenant = document.getElementById('tenantCanvas');
-            resizeCanvas(canvasTeknisi);
-            resizeCanvas(canvasTenant);
-
-            padTeknisi = new SignaturePad(canvasTeknisi, { backgroundColor: 'rgb(255, 255, 255)' });
-            padTenant = new SignaturePad(canvasTenant, { backgroundColor: 'rgb(255, 255, 255)' });
-
-            document.getElementById('btnHapusPadTeknisi').onclick = () => padTeknisi.clear();
-            document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
         });
 
-        document.getElementById('utilityForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const editingRowIndex = document.getElementById('editingRowIndex').value;
+        document.getElementById('btnBukaKamera').onclick = () => document.getElementById('cameraInput').click();
+        document.getElementById('btnUploadFoto').onclick = () => document.getElementById('galleryInput').click();
 
-            if (!document.getElementById('namaTenant').value) {
-                return alert('Pilih salah satu Tenant / Lokasi!');
-            }
-            if (!fotoBase64WithWatermark) {
-                return alert('Foto meteran wajib diambil/diupload!');
-            }
-            if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
-            if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Mengirim Data...';
-
-            const payload = {
-                action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
-                rowIndex: editingRowIndex || null,
-                kategoriSheet: document.getElementById('kategoriSheet').value,
-                namaTenant: cleanName(document.getElementById('namaTenant').value),
-                noLot: document.getElementById('noLot').value,
-                serialNumber: document.getElementById('serialNumber').value,
-                zona: document.getElementById('zona').value,
-                jenisPencatatan: document.getElementById('jenisPencatatan').value,
-                angka: parseFloat(document.getElementById('angka').value).toFixed(4),
-                namaTeknisi: document.getElementById('namaTeknisi').value,
-                namaPenandatanganTenant: document.getElementById('namaPenandatanganTenant').value,
-                foto: fotoBase64WithWatermark,
-                ttdTeknisi: padTeknisi.toDataURL(),
-                ttdTenant: padTenant.toDataURL()
-            };
-
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                alert('Data pencatatan berhasil disimpan!');
-                cancelEditMode();
-                padTeknisi.clear();
-                padTenant.clear();
-                setTimeout(fetchHistory, 1500);
-            } catch (err) {
-                alert('Gagal mengirim data: ' + err.message);
-            } finally {
-                submitBtn.disabled = false;
+        const handleFileSelect = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                rawImageFile = file;
+                updatePhotoWatermark();
             }
         };
-    </script>
+
+        document.getElementById('cameraInput').onchange = handleFileSelect;
+        document.getElementById('galleryInput').onchange = handleFileSelect;
+
+        document.getElementById('btnHapusFoto').onclick = () => {
+            rawImageFile = null;
+            fotoBase64WithWatermark = '';
+            document.getElementById('cameraInput').value = '';
+            document.getElementById('galleryInput').value = '';
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+        };
+
+        const canvasTeknisi = document.getElementById('teknisiCanvas');
+        const canvasTenant = document.getElementById('tenantCanvas');
+        resizeCanvas(canvasTeknisi);
+        resizeCanvas(canvasTenant);
+
+        padTeknisi = new SignaturePad(canvasTeknisi, { backgroundColor: 'rgb(255, 255, 255)' });
+        padTenant = new SignaturePad(canvasTenant, { backgroundColor: 'rgb(255, 255, 255)' });
+
+        document.getElementById('btnHapusPadTeknisi').onclick = () => padTeknisi.clear();
+        document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
+    });
+
+    document.getElementById('utilityForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const editingRowIndex = document.getElementById('editingRowIndex').value;
+
+        if (!document.getElementById('namaTenant').value) {
+            return alert('Pilih salah satu Tenant / Lokasi!');
+        }
+        if (!fotoBase64WithWatermark) {
+            return alert('Foto meteran wajib diambil/diupload!');
+        }
+        if (padTeknisi.isEmpty()) return alert('Tanda tangan teknisi wajib diisi!');
+        if (padTenant.isEmpty()) return alert('Tanda tangan tenant wajib diisi!');
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Mengirim Data...';
+
+        const payload = {
+            action: editingRowIndex ? "UPDATE_RECORD" : "ADD_RECORD",
+            rowIndex: editingRowIndex || null,
+            kategoriSheet: document.getElementById('kategoriSheet').value,
+            namaTenant: cleanName(document.getElementById('namaTenant').value),
+            noLot: document.getElementById('noLot').value,
+            serialNumber: document.getElementById('serialNumber').value,
+            zona: document.getElementById('zona').value,
+            jenisPencatatan: document.getElementById('jenisPencatatan').value,
+            angka: parseFloat(document.getElementById('angka').value).toFixed(4),
+            namaTeknisi: document.getElementById('namaTeknisi').value,
+            namaPenandatanganTenant: document.getElementById('namaPenandatanganTenant').value,
+            foto: fotoBase64WithWatermark,
+            ttdTeknisi: padTeknisi.toDataURL(),
+            ttdTenant: padTenant.toDataURL()
+        };
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            alert('Data pencatatan berhasil disimpan!');
+            cancelEditMode();
+            padTeknisi.clear();
+            padTenant.clear();
+            setTimeout(fetchHistory, 1500);
+        } catch (err) {
+            alert('Gagal mengirim data: ' + err.message);
+        } finally {
+            submitBtn.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>
