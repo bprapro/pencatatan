@@ -392,40 +392,49 @@
     }
 
     async function fetchHistory() {
-        const tbody = document.getElementById('historyTableBody');
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
-            const jsonRes = await res.json();
-            historyList = jsonRes.data || [];
+    const tbody = document.getElementById('historyTableBody');
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
+        const jsonRes = await res.json();
+        historyList = jsonRes.data || [];
 
-            tbody.innerHTML = '';
-            if (historyList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
-                return;
-            }
-
-            historyList.forEach((item, index) => {
-                const cleanNama = cleanName(item["NAMA TENANT"] || item.namaTenant) || item.noLot;
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50';
-                tr.innerHTML = `
-                    <td class="p-2">
-                        <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${item.kategoriSheet || item["KATEGORI SHEET"] || '-'}</span>
-                        <div class="font-bold text-gray-800 mt-1">${cleanNama}</div>
-                        <div class="text-[10px] text-gray-500">Lot: ${item.noLot || '-'} | SN: ${item.serialNumber || item.sn || '-'}</div>
-                    </td>
-                    <td class="p-2 font-semibold">${item.jenisPencatatan || item.jenis || '-'}</td>
-                    <td class="p-2 font-mono font-bold text-blue-600">${item.angka || '-'}</td>
-                    <td class="p-2 text-center">
-                        <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
+        tbody.innerHTML = '';
+        if (historyList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Belum ada riwayat di LOGSET</td></tr>`;
+            return;
         }
+
+        historyList.forEach((item, index) => {
+            // MENANGANI KEMUNGKINAN NAMA HEADER DARI GOOGLE SHEET / JSON
+            const rawNama = item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant || item["namaTenant"] || "";
+            const rawKategori = item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || item["kategoriSheet"] || "-";
+            const rawLot = item["NO LOT"] || item["No Lot"] || item.noLot || item["noLot"] || "-";
+            const rawSn = item["SERIAL NUMBER"] || item["SN"] || item.serialNumber || item.sn || "-";
+            const rawJenis = item["JENIS PENCATATAN"] || item["Jenis Pencatatan"] || item.jenisPencatatan || item.jenis || "-";
+            const rawAngka = item["ANGKA"] || item["Angka"] || item.angka || "-";
+
+            const cleanNamaDisplay = cleanName(rawNama) || rawLot || "Tanpa Nama";
+
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50';
+            tr.innerHTML = `
+                <td class="p-2">
+                    <span class="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">${rawKategori}</span>
+                    <div class="font-bold text-gray-800 mt-1">${cleanNamaDisplay}</div>
+                    <div class="text-[10px] text-gray-500">Lot: ${rawLot} | SN: ${rawSn}</div>
+                </td>
+                <td class="p-2 font-semibold">${rawJenis}</td>
+                <td class="p-2 font-mono font-bold text-blue-600">${rawAngka}</td>
+                <td class="p-2 text-center">
+                    <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px] font-semibold hover:bg-amber-600 shadow">✏️ Edit</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-500">Gagal memuat riwayat</td></tr>`;
     }
+}
 
     function cancelEditMode() {
         document.getElementById('editingRowIndex').value = '';
