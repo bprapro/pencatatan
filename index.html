@@ -296,73 +296,93 @@
             document.getElementById('zona').value = item.zona || '';
         }
 
-        // FUNGSI UTAMA WATERMARK PADA GAMBAR
-        function processImageWatermark(file) {
-            const namaTenant = document.getElementById('namaTenant').value || '-';
-            const namaPenandatangan = document.getElementById('namaPenandatanganTenant').value || '-';
-            const namaTeknisi = document.getElementById('namaTeknisi').value || '-';
-            const serialNumber = document.getElementById('serialNumber').value || '-';
+        // FUNGSI WATERMARK + AUTO RESIZE UNTUK CEGAH GAGAL UPLOAD
+function processImageWatermark(file) {
+    const namaTenant = document.getElementById('namaTenant').value || '-';
+    const namaPenandatangan = document.getElementById('namaPenandatanganTenant').value || '-';
+    const namaTeknisi = document.getElementById('namaTeknisi').value || '-';
+    const serialNumber = document.getElementById('serialNumber').value || '-';
 
-            // Format tanggal & jam WIB
-            const now = new Date();
-            const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
-                               now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const now = new Date();
+    const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
+                       now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+    const reader = new FileReader();
+    reader.onerror = () => alert('Gagal membaca file gambar dari galeri!');
+    
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => alert('Format gambar tidak didukung! Pastikan memilih foto JPG atau PNG.');
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
 
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
+            // RESIZE AUTOMATIS: Maksimal dimensi 1280px (agar tidak lelet/gagal upload)
+            const MAX_DIMENSION = 1280;
+            let width = img.width;
+            let height = img.height;
 
-                    // Konfigurasi Watermark Box
-                    const fontSize = Math.max(16, Math.floor(canvas.width / 35));
-                    ctx.font = `bold ${fontSize}px sans-serif`;
+            if (width > height) {
+                if (width > MAX_DIMENSION) {
+                    height *= MAX_DIMENSION / width;
+                    width = MAX_DIMENSION;
+                }
+            } else {
+                if (height > MAX_DIMENSION) {
+                    width *= MAX_DIMENSION / height;
+                    height = MAX_DIMENSION;
+                }
+            }
 
-                    const line1 = `${namaTenant} (${namaPenandatangan})`;
-                    const line2 = `${timeString} (${namaTeknisi})`;
-                    const line3 = `SN: ${serialNumber}`;
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
 
-                    const padding = fontSize * 0.8;
-                    const lineHeight = fontSize * 1.35;
-                    const boxHeight = (lineHeight * 3) + (padding * 2);
-                    const boxWidth = Math.max(
-                        ctx.measureText(line1).width,
-                        ctx.measureText(line2).width,
-                        ctx.measureText(line3).width
-                    ) + (padding * 2);
+            // Setting Ukuran Teks Watermark
+            const fontSize = Math.max(14, Math.floor(canvas.width / 35));
+            ctx.font = `bold ${fontSize}px sans-serif`;
 
-                    const x = padding;
-                    const y = canvas.height - boxHeight - padding;
+            const line1 = `${namaTenant} (${namaPenandatangan})`;
+            const line2 = `${timeString} (${namaTeknisi})`;
+            const line3 = `SN: ${serialNumber}`;
 
-                    // Draw Background Transparan Soft Black
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                    ctx.fillRect(x, y, boxWidth, boxHeight);
+            const padding = fontSize * 0.8;
+            const lineHeight = fontSize * 1.35;
+            const boxHeight = (lineHeight * 3) + (padding * 2);
+            const boxWidth = Math.max(
+                ctx.measureText(line1).width,
+                ctx.measureText(line2).width,
+                ctx.measureText(line3).width
+            ) + (padding * 2);
 
-                    // Draw Text Watermark (Warna Kuning & Putih)
-                    ctx.textBaseline = 'top';
-                    
-                    ctx.fillStyle = '#fde047'; // Line 1 Yellow
-                    ctx.fillText(line1, x + padding, y + padding);
+            const x = padding;
+            const y = canvas.height - boxHeight - padding;
 
-                    ctx.fillStyle = '#ffffff'; // Line 2 White
-                    ctx.fillText(line2, x + padding, y + padding + lineHeight);
+            // Background Box Transparan
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(x, y, boxWidth, boxHeight);
 
-                    ctx.fillStyle = '#38bdf8'; // Line 3 Light Blue (SN)
-                    ctx.fillText(line3, x + padding, y + padding + (lineHeight * 2));
+            // Teks Watermark
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#fde047'; // Baris 1: Kuning
+            ctx.fillText(line1, x + padding, y + padding);
 
-                    fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.85);
-                    document.getElementById('photoPreview').src = fotoBase64WithWatermark;
-                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+            ctx.fillStyle = '#ffffff'; // Baris 2: Putih
+            ctx.fillText(line2, x + padding, y + padding + lineHeight);
+
+            ctx.fillStyle = '#38bdf8'; // Baris 3: Biru Muda
+            ctx.fillText(line3, x + padding, y + padding + (lineHeight * 2));
+
+            // Konversi Hasil Akhir ke JPEG (Kompresi Kualitas 70%)
+            fotoBase64WithWatermark = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('photoPreview').src = fotoBase64WithWatermark;
+            document.getElementById('photoPreviewContainer').classList.remove('hidden');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
         async function fetchHistory() {
             const tbody = document.getElementById('historyTableBody');
