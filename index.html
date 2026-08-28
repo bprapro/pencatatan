@@ -20,7 +20,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen pb-12">
 
-    <!-- TOP NAVIGATION BAR (STICKY TOP) -->
+    <!-- TOP NAVIGATION BAR -->
     <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -31,7 +31,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-slate-900 text-lg tracking-tight leading-none">LOGSET <span class="text-slate-600 text-xs font-semibold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">v2.0</span></h1>
+                    <h1 class="font-extrabold text-slate-900 text-lg tracking-tight leading-none">LOGSET <span class="text-indigo-600 text-xs font-semibold bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">v2.0</span></h1>
                     <p class="text-xs text-slate-400 font-medium mt-0.5">Utility Check & Billing System</p>
                 </div>
             </div>
@@ -42,12 +42,11 @@
                 </button>
                 <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
                 <div class="hidden sm:flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs border border-slate-300">OP</div>
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-200">OP</div>
                     <span class="text-xs font-semibold text-slate-700">Operator Master</span>
                 </div>
 
-                <!-- HAMBURGER MENU BUTTON MONOKROM -->
-                <button id="btnOpenMenu" type="button" class="p-2.5 text-slate-800 hover:text-white bg-slate-100 hover:bg-slate-900 rounded-xl transition flex items-center justify-center border border-slate-200 ml-1">
+                <button id="btnOpenMenu" type="button" class="p-2.5 text-slate-800 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 rounded-xl transition flex items-center justify-center border border-slate-200 ml-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -56,7 +55,7 @@
         </div>
     </header>
 
-    <!-- SLIDE-OVER DRAWER MENU MONOKROM -->
+    <!-- SLIDE-OVER DRAWER MENU (ICON MONOKROM) -->
     <div id="statusMenuModal" class="fixed inset-0 z-50 hidden">
         <div id="statusMenuBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -64,75 +63,79 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-2">
+                            <!-- ICON MONOKROM -->
                             <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                             <h2 class="text-lg font-bold text-slate-900">Menu & Analisis Utility</h2>
                         </div>
                         <button id="btnCloseMenu" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold">✕</button>
                     </div>
 
-                    <!-- METRIC CARDS MONOKROM -->
+                    <!-- METRIC CARDS METERS -->
                     <div class="space-y-4">
-                        <!-- Card 1: Status Air -->
-                        <div onclick="openInfographicModal('AIR')" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
+                        <!-- Card 1: Air (Icon Monokrom) -->
+                        <div onclick="openInfographicModal('AIR')" class="bg-blue-50/50 hover:bg-blue-50 p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Air</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-slate-600 transition">Tenant & Eateria</h3>
+                                    <span class="text-xs font-bold text-blue-500 uppercase tracking-wider">Status Air</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-blue-600 transition">Tenant & Eateria</h3>
                                 </div>
-                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg shadow-sm border border-slate-200">
+                                <!-- ICON MONOKROM -->
+                                <span class="w-10 h-10 rounded-xl bg-white text-slate-700 flex items-center justify-center shadow-sm border border-slate-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
-                                <span class="text-slate-800 font-bold flex items-center gap-1">Lihat Infografis Pemakaian &rarr;</span>
-                                <span class="text-slate-400">Aktif</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-blue-100 text-xs">
+                                <span class="text-blue-700 font-bold flex items-center gap-1">Lihat Infografis Pemakaian &rarr;</span>
+                                <span class="text-blue-500 font-medium">Aktif</span>
                             </div>
                         </div>
 
-                        <!-- Card 2: Status Listrik -->
-                        <div onclick="openInfographicModal('LISTRIK')" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
+                        <!-- Card 2: Listrik (Icon Monokrom) -->
+                        <div onclick="openInfographicModal('LISTRIK')" class="bg-amber-50/50 hover:bg-amber-50 p-4 rounded-2xl border border-amber-100 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Listrik</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-slate-600 transition">3 Kategori</h3>
+                                    <span class="text-xs font-bold text-amber-500 uppercase tracking-wider">Status Listrik</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-amber-600 transition">3 Kategori</h3>
                                 </div>
-                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg shadow-sm border border-slate-200">
+                                <!-- ICON MONOKROM -->
+                                <span class="w-10 h-10 rounded-xl bg-white text-slate-700 flex items-center justify-center shadow-sm border border-slate-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
-                                <span class="text-slate-800 font-bold flex items-center gap-1">Lihat Infografis Pemakaian &rarr;</span>
-                                <span class="text-slate-400">Aktif</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-amber-100 text-xs">
+                                <span class="text-amber-700 font-bold flex items-center gap-1">Lihat Infografis Pemakaian &rarr;</span>
+                                <span class="text-amber-500 font-medium">Aktif</span>
                             </div>
                         </div>
 
-                        <!-- Card 3: Galeri Foto Meteran -->
-                        <div onclick="openGalleryModal()" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
+                        <!-- Card 3: Galeri (Icon Monokrom) -->
+                        <div onclick="openGalleryModal()" class="bg-indigo-50/50 hover:bg-indigo-50 p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Galeri Foto</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-slate-600 transition">Dokumentasi Meteran</h3>
+                                    <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider">Galeri Foto</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-indigo-600 transition">Dokumentasi Meteran</h3>
                                 </div>
-                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg shadow-sm border border-slate-200">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <!-- ICON MONOKROM -->
+                                <span class="w-10 h-10 rounded-xl bg-white text-slate-700 flex items-center justify-center shadow-sm border border-slate-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
-                                <span class="text-slate-800 font-bold flex items-center gap-1">Filter & Foto Meteran &rarr;</span>
-                                <span class="text-slate-400">Watermark</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-indigo-100 text-xs">
+                                <span class="text-indigo-700 font-bold flex items-center gap-1">Filter & Foto Meteran &rarr;</span>
+                                <span class="text-indigo-500 font-medium">Watermark</span>
                             </div>
                         </div>
 
                         <!-- Card 4: Quick Action -->
-                        <div onclick="triggerQuickAction()" class="bg-slate-900 p-5 rounded-2xl text-white shadow-lg flex flex-col justify-between cursor-pointer hover:bg-slate-800 transition">
+                        <div onclick="triggerQuickAction()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 p-5 rounded-2xl text-white shadow-lg flex flex-col justify-between cursor-pointer hover:opacity-95 transition">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Action</span>
+                                    <span class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Quick Action</span>
                                     <h3 class="text-lg font-bold text-white mt-1">Input Meteran Baru</h3>
                                 </div>
-                                <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">↗</span>
+                                <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">↗</span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-2">Pilih kategori di formulir utama untuk mencatat hari ini.</p>
+                            <p class="text-xs text-indigo-100 mt-2">Pilih kategori di formulir utama untuk mencatat hari ini.</p>
                         </div>
                     </div>
                 </div>
@@ -144,11 +147,12 @@
         </div>
     </div>
 
-    <!-- MODAL INFOGRAFIS PEMAKAIAN (MONOKROM MODAL) -->
+    <!-- MODAL INFOGRAFIS PEMAKAIAN -->
     <div id="infographicModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-100 p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
+                    <!-- ICON MONOKROM -->
                     <span id="infoModalIcon" class="p-2.5 rounded-xl bg-slate-100 text-slate-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </span>
@@ -164,27 +168,27 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase">Filter Tenant</label>
-                    <select id="infoTenantSelect" onchange="updateInfographicChart()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-slate-800">
+                    <select id="infoTenantSelect" onchange="updateInfographicChart()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="ALL">-- Semua Tenant (Konsumsi Total) --</option>
                     </select>
                 </div>
 
-                <div class="bg-slate-100 border border-slate-200 p-3 rounded-2xl flex items-center justify-between">
+                <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-2xl flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-500 uppercase">Pemakaian Tertinggi</span>
+                        <span class="text-[10px] font-bold text-emerald-600 uppercase">Pemakaian Tertinggi</span>
                         <div id="highestTenantName" class="font-extrabold text-xs text-slate-900 truncate max-w-[130px]">-</div>
-                        <div id="highestTenantVal" class="text-xs font-mono font-bold text-slate-800">0</div>
+                        <div id="highestTenantVal" class="text-xs font-mono font-bold text-emerald-700">0</div>
                     </div>
-                    <span class="text-slate-400 font-bold text-xs">TOP</span>
+                    <span class="text-emerald-500 font-bold text-xs">TOP</span>
                 </div>
 
-                <div class="bg-slate-100 border border-slate-200 p-3 rounded-2xl flex items-center justify-between">
+                <div class="bg-rose-50 border border-rose-100 p-3 rounded-2xl flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-500 uppercase">Pemakaian Terendah</span>
+                        <span class="text-[10px] font-bold text-rose-600 uppercase">Pemakaian Terendah</span>
                         <div id="lowestTenantName" class="font-extrabold text-xs text-slate-900 truncate max-w-[130px]">-</div>
-                        <div id="lowestTenantVal" class="text-xs font-mono font-bold text-slate-800">0</div>
+                        <div id="lowestTenantVal" class="text-xs font-mono font-bold text-rose-700">0</div>
                     </div>
-                    <span class="text-slate-400 font-bold text-xs">LOW</span>
+                    <span class="text-rose-500 font-bold text-xs">LOW</span>
                 </div>
             </div>
 
@@ -192,7 +196,7 @@
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
                 <div class="flex justify-between items-center">
                     <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Trend Riwayat Meter Stand</h4>
-                    <span id="unitBadge" class="text-[10px] font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded-full">kWh / m³</span>
+                    <span id="unitBadge" class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">kWh / m³</span>
                 </div>
                 <div class="relative h-64 w-full">
                     <canvas id="utilityChart"></canvas>
@@ -201,19 +205,19 @@
 
             <!-- HIGHLIGHT SUMMARY STATS -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div class="bg-slate-100 p-3 rounded-xl border border-slate-200/60">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase">Total Pencatatan</div>
                     <div id="statTotalLog" class="text-base font-extrabold text-slate-800">0</div>
                 </div>
-                <div class="bg-slate-100 p-3 rounded-xl border border-slate-200/60">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase">Rata-Rata Stand</div>
                     <div id="statAvgStand" class="text-base font-extrabold text-slate-800">0</div>
                 </div>
-                <div class="bg-slate-100 p-3 rounded-xl border border-slate-200/60">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase">Stand Terendah</div>
                     <div id="statMinStand" class="text-base font-extrabold text-slate-800">0</div>
                 </div>
-                <div class="bg-slate-100 p-3 rounded-xl border border-slate-200/60">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase">Stand Tertinggi</div>
                     <div id="statMaxStand" class="text-base font-extrabold text-slate-800">0</div>
                 </div>
@@ -221,11 +225,12 @@
         </div>
     </div>
 
-    <!-- MODAL GALERI DOKUMENTASI FOTO METERAN MONOKROM -->
+    <!-- MODAL GALERI DOKUMENTASI FOTO METERAN -->
     <div id="galleryModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-100 p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
+                    <!-- ICON MONOKROM -->
                     <span class="p-2.5 rounded-xl bg-slate-100 text-slate-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </span>
@@ -237,17 +242,17 @@
                 <button onclick="closeGalleryModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
             </div>
 
-            <!-- FILTER GALERI (MONOKROM) -->
+            <!-- FILTER GALERI -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Filter Tenant / Lokasi</label>
-                    <select id="galleryTenantFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-slate-800">
+                    <select id="galleryTenantFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="ALL">-- Semua Tenant --</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Filter Penggunaan Utility</label>
-                    <select id="galleryTypeFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-slate-800">
+                    <select id="galleryTypeFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="ALL">-- Semua Utility (Air & Listrik) --</option>
                         <option value="AIR">Hanya AIR</option>
                         <option value="LISTRIK">Hanya LISTRIK</option>
@@ -267,32 +272,32 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- FORM CONTAINER (COL 7) -->
+            <!-- FORM CONTAINER -->
             <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                     <div>
                         <h2 class="font-bold text-slate-800 text-base">Form Input Pencatatan</h2>
                         <p class="text-xs text-slate-400">Lengkapi data di bawah ini secara presisi</p>
                     </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Step 1 - 4</span>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">Step 1 - 4</span>
                 </div>
 
                 <form id="utilityForm" class="p-6 space-y-6">
 
                     <!-- EDIT NOTICE BANNER -->
-                    <div id="editNotice" class="hidden bg-slate-100 border border-slate-300 p-3.5 rounded-xl text-xs text-slate-800 flex justify-between items-center">
+                    <div id="editNotice" class="hidden bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-xs text-amber-800 flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-slate-700 animate-pulse"></span>
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             <span><b>Mode Edit Mengubah Baris:</b> #<b id="editRowNumber"></b></span>
                         </div>
-                        <button type="button" id="btnCancelEdit" class="text-slate-800 hover:text-slate-900 bg-slate-200 px-3 py-1 rounded-lg font-bold text-[11px] transition">Batal Edit</button>
+                        <button type="button" id="btnCancelEdit" class="text-amber-800 hover:text-amber-950 bg-amber-200/60 px-3 py-1 rounded-lg font-bold text-[11px] transition">Batal Edit</button>
                     </div>
 
                     <!-- STEP 1: KATEGORI -->
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">1. Pilih Kategori Utility <span class="text-rose-500">*</span></label>
                         <div class="relative">
-                            <select id="kategoriSheet" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-slate-800 focus:border-slate-800 transition outline-none appearance-none">
+                            <select id="kategoriSheet" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none appearance-none">
                                 <option value="" disabled selected>-- Pilih Kategori Utility --</option>
                                 <option value="AIR">AIR TENANT</option>
                                 <option value="AIR EATERIA">AIR EATERIA</option>
@@ -309,9 +314,12 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">2. Pilih Tenant / Lokasi Meteran</label>
                         
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 text-xs">🔍</span>
+                            <!-- ICON MONOKROM -->
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </span>
                             <input type="text" id="tenantSearchInput" autocomplete="off" placeholder="Ketik nama tenant, No Lot, atau SN..."
-                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-slate-800 outline-none transition">
+                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                         </div>
 
                         <div class="border border-slate-200 rounded-xl max-h-48 overflow-y-auto bg-white divide-y divide-slate-100 custom-scrollbar shadow-inner" id="tenantListBox">
@@ -322,19 +330,19 @@
                         <input type="hidden" id="namaTenant" required>
                         <input type="hidden" id="noLot">
 
-                        <div id="lotDropdownContainer" class="hidden p-3 bg-slate-100 border border-slate-200 rounded-xl space-y-1">
-                            <label class="block text-xs font-bold text-slate-800">Pilih Lot / Lokasi Spesifik:</label>
-                            <select id="lotSelectDropdown" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-slate-800 outline-none"></select>
+                        <div id="lotDropdownContainer" class="hidden p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-1">
+                            <label class="block text-xs font-bold text-indigo-900">Pilih Lot / Lokasi Spesifik:</label>
+                            <select id="lotSelectDropdown" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"></select>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-500 mb-1">Serial Number (SN)</label>
-                                <input type="text" id="serialNumber" placeholder="SN Meteran..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-slate-800 outline-none">
+                                <input type="text" id="serialNumber" placeholder="SN Meteran..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-500 mb-1">Zona / Area</label>
-                                <input type="text" id="zona" placeholder="Zona Area..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-slate-800 outline-none">
+                                <input type="text" id="zona" placeholder="Zona Area..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                     </div>
@@ -350,7 +358,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-500 mb-1">Angka Meteran Stand <span class="text-rose-500">*</span></label>
-                                <input type="number" id="angka" step="0.0001" min="0" required placeholder="0000.0000" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-800 outline-none">
+                                <input type="number" id="angka" step="0.0001" min="0" required placeholder="0000.0000" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold font-mono text-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
 
@@ -360,12 +368,16 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
                                 <button type="button" id="btnBukaKamera" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center justify-center gap-2 hover:bg-slate-100 transition">
-                                    📷 Buka Kamera
+                                    <!-- ICON KAMERA MONOKROM -->
+                                    <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    Buka Kamera
                                 </button>
 
                                 <input type="file" id="galleryInput" accept="image/*" class="hidden">
                                 <button type="button" id="btnUploadFoto" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center justify-center gap-2 hover:bg-slate-100 transition">
-                                    📁 Galeri Foto
+                                    <!-- ICON GALERI MONOKROM -->
+                                    <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Galeri Foto
                                 </button>
                             </div>
 
@@ -385,25 +397,25 @@
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                                 <div class="flex justify-between items-center mb-1.5">
                                     <span class="text-[11px] font-bold text-slate-700">TTD Teknisi *</span>
-                                    <button type="button" id="btnHapusPadTeknisi" class="text-[10px] text-slate-500 font-bold hover:underline">Reset</button>
+                                    <button type="button" id="btnHapusPadTeknisi" class="text-[10px] text-indigo-600 font-bold hover:underline">Reset</button>
                                 </div>
                                 <div class="canvas-container"><canvas id="teknisiCanvas" class="sig-pad"></canvas></div>
-                                <input type="text" id="namaTeknisi" required placeholder="Nama Teknisi..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-slate-800 outline-none">
+                                <input type="text" id="namaTeknisi" required placeholder="Nama Teknisi..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
 
                             <!-- TTD TENANT -->
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                                 <div class="flex justify-between items-center mb-1.5">
                                     <span class="text-[11px] font-bold text-slate-700">TTD Tenant *</span>
-                                    <button type="button" id="btnHapusPadTenant" class="text-[10px] text-slate-500 font-bold hover:underline">Reset</button>
+                                    <button type="button" id="btnHapusPadTenant" class="text-[10px] text-indigo-600 font-bold hover:underline">Reset</button>
                                 </div>
                                 <div class="canvas-container"><canvas id="tenantCanvas" class="sig-pad"></canvas></div>
-                                <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Penandatangan..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-slate-800 outline-none">
+                                <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Penandatangan..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg active:scale-[0.99] transition duration-150">
+                    <button type="submit" id="submitBtn" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 active:scale-[0.99] transition duration-150">
                         Kirim Data Pencatatan
                     </button>
                 </form>
@@ -418,14 +430,16 @@
                         </h2>
                         <p class="text-xs text-slate-400">Data pencatatan terbaru yang masuk</p>
                     </div>
-                    <button id="btnRefreshHistory" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition flex items-center gap-1">
-                        🔄 Sync
+                    <button id="btnRefreshHistory" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition flex items-center gap-1.5">
+                        <!-- ICON SYNC MONOKROM -->
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Sync
                     </button>
                 </div>
 
-                <!-- TAB FILTER RIWAYAT MONOKROM -->
+                <!-- TAB FILTER RIWAYAT BERWARNA -->
                 <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2" id="historyTabContainer">
-                    <button type="button" onclick="filterHistory('ALL')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-slate-900">Semua</button>
+                    <button type="button" onclick="filterHistory('ALL')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-indigo-600 text-white">Semua</button>
                     <button type="button" onclick="filterHistory('AIR')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Air Tenant</button>
                     <button type="button" onclick="filterHistory('AIR EATERIA')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Air Eateria</button>
                     <button type="button" onclick="filterHistory('LISTRIK TENANT')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Listrik Tenant</button>
@@ -451,7 +465,7 @@
 
                 <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
                     <span>* Klik Edit untuk mengubah data di sheet</span>
-                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                 </div>
             </div>
 
@@ -462,8 +476,8 @@
     <div id="thankYouModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full text-center border border-slate-100 transform transition-all">
             <div class="relative w-28 h-28 mx-auto mb-4">
-                <img src="./foto rico.png" alt="Rico" class="w-full h-full object-cover rounded-full shadow-lg border-4 border-slate-900">
-                <div class="absolute bottom-0 right-0 bg-slate-900 text-white p-1.5 rounded-full border-2 border-white shadow">
+                <img src="./foto rico.png" alt="Rico" class="w-full h-full object-cover rounded-full shadow-lg border-4 border-indigo-500">
+                <div class="absolute bottom-0 right-0 bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white shadow">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
             </div>
@@ -471,7 +485,7 @@
             <h3 class="text-xl font-extrabold text-slate-900 mb-1">Terima Kasih!</h3>
             <p class="text-xs text-slate-500 mb-6 leading-relaxed">Data pencatatan meteran telah berhasil tersimpan & diverifikasi ke sistem LOGSET.</p>
             
-            <button type="button" id="btnIsiBaru" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm">
+            <button type="button" id="btnIsiBaru" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition active:scale-95 flex items-center justify-center gap-2 text-sm">
                 Input Data Baru
             </button>
         </div>
@@ -508,7 +522,7 @@
 
     async function fetchMasterByCategory(category) {
         const box = document.getElementById('tenantListBox');
-        box.innerHTML = `<div class="p-4 text-center text-xs text-slate-600 font-semibold animate-pulse">Memuat data master sheet ${category}...</div>`;
+        box.innerHTML = `<div class="p-4 text-center text-xs text-indigo-600 font-semibold animate-pulse">Memuat data master sheet ${category}...</div>`;
         
         try {
             const res = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(category)}`);
@@ -575,14 +589,14 @@
             const group = groupedTenants[key];
             const isSelected = selectedTenantGroup && selectedTenantGroup.displayName === key;
             const row = document.createElement('div');
-            row.className = `p-3 flex items-center justify-between cursor-pointer transition border-b border-slate-50 last:border-b-0 ${isSelected ? 'bg-slate-100 border-l-4 border-slate-800' : 'hover:bg-slate-50'}`;
+            row.className = `p-3 flex items-center justify-between cursor-pointer transition border-b border-slate-50 last:border-b-0 ${isSelected ? 'bg-indigo-50/70 border-l-4 border-indigo-600' : 'hover:bg-slate-50'}`;
             
             const countItems = group.items.length;
-            const badgeInfo = countItems > 1 ? `<span class="text-[10px] bg-slate-200 text-slate-800 px-2 py-0.5 rounded-full font-bold">${countItems} Lot</span>` : '';
+            const badgeInfo = countItems > 1 ? `<span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">${countItems} Lot</span>` : '';
 
             row.innerHTML = `
                 <div class="flex items-center gap-2.5">
-                    <input type="radio" name="tenantRadio" class="w-3.5 h-3.5 text-slate-900 pointer-events-none" ${isSelected ? 'checked' : ''}>
+                    <input type="radio" name="tenantRadio" class="w-3.5 h-3.5 text-indigo-600 pointer-events-none" ${isSelected ? 'checked' : ''}>
                     <span class="font-bold text-xs text-slate-800">${group.displayName}</span>
                 </div>
                 ${badgeInfo}
@@ -719,7 +733,7 @@
             btn.className = 'history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700';
         });
         
-        event.target.className = 'history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-slate-900';
+        event.target.className = 'history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-indigo-600 text-white';
         renderHistoryTable();
     }
 
@@ -756,11 +770,11 @@
                 <td class="py-3">
                     <div class="font-bold text-white">${cleanNamaDisplay}</div>
                     <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
-                        <span class="bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold border border-slate-700">${rawKategori}</span>
+                        <span class="bg-indigo-950 text-indigo-300 px-1.5 py-0.5 rounded font-bold border border-indigo-800/50">${rawKategori}</span>
                         <span>SN: ${rawSn}</span>
                     </div>
                 </td>
-                <td class="py-3 font-mono font-bold text-slate-200">${parseFloat(rawAngka).toLocaleString('id-ID')}</td>
+                <td class="py-3 font-mono font-bold text-indigo-400">${parseFloat(rawAngka).toLocaleString('id-ID')}</td>
                 <td class="py-3 text-right">
                     <button type="button" onclick="editHistoryItem(${originalIndex})" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-slate-700 transition">Edit</button>
                 </td>
@@ -769,9 +783,7 @@
         });
     }
 
-    // ==========================================
-    // LOGIC MODAL INFOGRAFIS (MONOKROM)
-    // ==========================================
+    // INFOGRAFIS
     function openInfographicModal(type) {
         currentInfographicType = type;
         document.getElementById('statusMenuModal').classList.add('hidden');
@@ -885,7 +897,6 @@
             myUtilityChart.destroy();
         }
 
-        // WARNA MONOKROM ELEGAN UNTUK GRAFIK
         myUtilityChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -893,12 +904,12 @@
                 datasets: [{
                     label: `Stand ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`,
                     data: dataValues.length > 0 ? dataValues : [0],
-                    borderColor: '#0f172a',
-                    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.08)',
                     borderWidth: 2.5,
                     fill: true,
                     tension: 0.3,
-                    pointBackgroundColor: '#0f172a',
+                    pointBackgroundColor: '#4f46e5',
                     pointRadius: 4
                 }]
             },
@@ -916,9 +927,7 @@
         });
     }
 
-    // ==========================================
-    // LOGIC MODAL GALERI FOTO METERAN MONOKROM
-    // ==========================================
+    // GALERI FOTO METERAN
     function getDirectImageUrl(url) {
         if (!url) return '';
         let cleanUrl = String(url).trim();
@@ -1017,7 +1026,7 @@
                     <div class="font-extrabold text-xs text-slate-800 truncate">${tenantName}</div>
                     <div class="flex justify-between items-center text-[11px]">
                         <span class="text-slate-400">${String(date).substring(0, 10)}</span>
-                        <span class="font-mono font-bold text-slate-900">${parseFloat(angka || 0).toLocaleString('id-ID')}</span>
+                        <span class="font-mono font-bold text-indigo-600">${parseFloat(angka || 0).toLocaleString('id-ID')}</span>
                     </div>
                 </div>
             `;
@@ -1051,7 +1060,7 @@
         document.getElementById('namaPenandatanganTenant').value = item["NAMA TENANT PENANDATANGAN"] || item.namaPenandatanganTenant || "";
 
         document.getElementById('submitBtn').innerText = 'Update Data Pencatatan';
-        document.getElementById('submitBtn').className = 'w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl shadow-lg transition';
+        document.getElementById('submitBtn').className = 'w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-lg shadow-amber-200 transition';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1068,7 +1077,7 @@
         document.getElementById('tenantListBox').innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-medium">Silakan pilih kategori utility di atas terlebih dahulu...</div>`;
 
         document.getElementById('submitBtn').innerText = 'Kirim Data Pencatatan';
-        document.getElementById('submitBtn').className = 'w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition';
+        document.getElementById('submitBtn').className = 'w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition';
     }
 
     function showThankYouModal() {
