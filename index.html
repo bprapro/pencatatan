@@ -6,11 +6,13 @@
     <title>LOGSET — Utility Management Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- Chart.js CDN untuk Infografis Visual -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f8; }
         .canvas-container { position: relative; width: 100%; height: 140px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 0.75rem; touch-action: none; }
-        canvas { width: 100%; height: 100%; border-radius: 0.75rem; }
+        canvas.sig-pad { width: 100%; height: 100%; border-radius: 0.75rem; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -41,7 +43,7 @@
                     <span class="text-xs font-semibold text-slate-700">Operator Master</span>
                 </div>
 
-                <!-- HAMBURGER MENU BUTTON (MOBILE & ALL SCREENS) -->
+                <!-- HAMBURGER MENU BUTTON (GARIS 3 STICKY) -->
                 <button id="btnOpenMenu" type="button" class="p-2.5 text-slate-700 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 rounded-xl transition flex items-center justify-center border border-slate-200 ml-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -51,7 +53,7 @@
         </div>
     </header>
 
-    <!-- SLIDE-OVER MODAL STATUS MENU (PEMANGGIL GARIS 3) -->
+    <!-- SLIDE-OVER DRAWER MENU (GARIS 3) -->
     <div id="statusMenuModal" class="fixed inset-0 z-50 hidden">
         <div id="statusMenuBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -60,68 +62,68 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-2">
                             <span class="text-xl">📊</span>
-                            <h2 class="text-lg font-bold text-slate-900">Status Utility & Info</h2>
+                            <h2 class="text-lg font-bold text-slate-900">Menu & Analisis Utility</h2>
                         </div>
                         <button id="btnCloseMenu" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold">✕</button>
                     </div>
 
-                    <!-- METRIC CARDS OVERVIEW (DITAMPILKAN DI DALAM GARIS 3) -->
+                    <!-- METRIC CARDS OVERVIEW (BISA DIKLIK) -->
                     <div class="space-y-4">
-                        <!-- Card 1 -->
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <!-- Card 1: Status Air -->
+                        <div onclick="openInfographicModal('AIR')" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Air</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">Tenant & Eateria</h3>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-blue-600 transition">Tenant & Eateria</h3>
                                 </div>
-                                <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">💧</span>
+                                <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold shadow-sm">💧</span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
-                                <span class="text-emerald-600 font-bold">↑ Active</span>
-                                <span class="text-slate-400">Master Updated</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
+                                <span class="text-blue-600 font-bold flex items-center gap-1">📈 Lihat Infografis Pemakaian &rarr;</span>
+                                <span class="text-slate-400">Aktif</span>
                             </div>
                         </div>
 
-                        <!-- Card 2 -->
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <!-- Card 2: Status Listrik -->
+                        <div onclick="openInfographicModal('LISTRIK')" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Listrik</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">3 Kategori</h3>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-amber-600 transition">3 Kategori</h3>
                                 </div>
-                                <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">⚡</span>
+                                <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold shadow-sm">⚡</span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
-                                <span class="text-indigo-600 font-bold">Tenant/Eateria/Storage</span>
-                                <span class="text-slate-400">Ready</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
+                                <span class="text-amber-600 font-bold flex items-center gap-1">📊 Lihat Infografis Pemakaian &rarr;</span>
+                                <span class="text-slate-400">Aktif</span>
                             </div>
                         </div>
 
-                        <!-- Card 3 -->
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <!-- Card 3: Galeri Dokumentasi Foto Meteran -->
+                        <div onclick="openGalleryModal()" class="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer group transition">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sistem Validasi</span>
-                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">Watermark</h3>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Galeri Foto</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5 group-hover:text-emerald-600 transition">Dokumentasi Meteran</h3>
                                 </div>
-                                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">📷</span>
+                                <span class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold shadow-sm">🖼️</span>
                             </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
-                                <span class="text-emerald-600 font-bold">Auto Timestamp</span>
-                                <span class="text-slate-400">Active</span>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
+                                <span class="text-emerald-600 font-bold flex items-center gap-1">🔍 Filter & Foto Meteran &rarr;</span>
+                                <span class="text-slate-400">Watermark</span>
                             </div>
                         </div>
 
-                        <!-- Card 4 (Quick Action) -->
-                        <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 rounded-2xl text-white shadow-lg flex flex-col justify-between">
+                        <!-- Card 4: Quick Action -->
+                        <div onclick="triggerQuickAction()" class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 rounded-2xl text-white shadow-lg flex flex-col justify-between cursor-pointer hover:opacity-95 transition">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <span class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Quick Action</span>
                                     <h3 class="text-lg font-bold text-white mt-1">Input Meteran Baru</h3>
                                 </div>
-                                <button onclick="document.getElementById('statusMenuModal').classList.add('hidden'); document.getElementById('kategoriSheet').focus()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white transition">↗</button>
+                                <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">↗</span>
                             </div>
-                            <p class="text-xs text-indigo-100/80 mt-2">Pilih kategori di bawah untuk memulai pencatatan hari ini.</p>
+                            <p class="text-xs text-indigo-100/80 mt-2">Pilih kategori di formulir utama untuk mencatat hari ini.</p>
                         </div>
                     </div>
                 </div>
@@ -133,6 +135,124 @@
         </div>
     </div>
 
+    <!-- MODAL INFOGRAFIS PEMAKAIAN (AIR / LISTRIK) -->
+    <div id="infographicModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-100 p-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <span id="infoModalIcon" class="text-2xl p-2 rounded-xl bg-slate-100">📊</span>
+                    <div>
+                        <h3 id="infoModalTitle" class="text-xl font-extrabold text-slate-900">Infografis Pemakaian</h3>
+                        <p class="text-xs text-slate-500">Analisis histori pemakaian & perbandingan antar tenant</p>
+                    </div>
+                </div>
+                <button onclick="closeInfographicModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+            </div>
+
+            <!-- FILTER TOP/LOWEST & TENANT SELECTOR -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Select Tenant -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase">Filter Tenant</label>
+                    <select id="infoTenantSelect" onchange="updateInfographicChart()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-600">
+                        <option value="ALL">-- Semua Tenant (Konsumsi Total) --</option>
+                    </select>
+                </div>
+
+                <!-- Card High Consumption -->
+                <div class="bg-rose-50 border border-rose-100 p-3 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-rose-500 uppercase">🔥 Pemakaian Tertinggi</span>
+                        <div id="highestTenantName" class="font-extrabold text-xs text-slate-900 truncate max-w-[130px]">-</div>
+                        <div id="highestTenantVal" class="text-xs font-mono font-bold text-rose-600">0</div>
+                    </div>
+                    <span class="text-xl">🔺</span>
+                </div>
+
+                <!-- Card Low Consumption -->
+                <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-600 uppercase">🌱 Pemakaian Terendah</span>
+                        <div id="lowestTenantName" class="font-extrabold text-xs text-slate-900 truncate max-w-[130px]">-</div>
+                        <div id="lowestTenantVal" class="text-xs font-mono font-bold text-emerald-600">0</div>
+                    </div>
+                    <span class="text-xl">🔻</span>
+                </div>
+            </div>
+
+            <!-- INFOGRAFIS GRAFIK CANVAS -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Trend Riwayat Meter Stand</h4>
+                    <span id="unitBadge" class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">kWh / m³</span>
+                </div>
+                <div class="relative h-64 w-full">
+                    <canvas id="utilityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- HIGHLIGHT SUMMARY STATS -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <div class="bg-slate-100/70 p-3 rounded-xl">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Total Pencatatan</div>
+                    <div id="statTotalLog" class="text-base font-extrabold text-slate-800">0</div>
+                </div>
+                <div class="bg-slate-100/70 p-3 rounded-xl">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Rata-Rata Stand</div>
+                    <div id="statAvgStand" class="text-base font-extrabold text-indigo-600">0</div>
+                </div>
+                <div class="bg-slate-100/70 p-3 rounded-xl">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Stand Terendah</div>
+                    <div id="statMinStand" class="text-base font-extrabold text-emerald-600">0</div>
+                </div>
+                <div class="bg-slate-100/70 p-3 rounded-xl">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Stand Tertinggi</div>
+                    <div id="statMaxStand" class="text-base font-extrabold text-rose-600">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GALERI DOKUMENTASI FOTO METERAN -->
+    <div id="galleryModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-100 p-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl p-2 rounded-xl bg-emerald-50 text-emerald-600">🖼️</span>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900">Galeri Foto Dokumentasi Meteran</h3>
+                        <p class="text-xs text-slate-500">Arsip foto fisik meteran beserta timestamp & tanda tangan</p>
+                    </div>
+                </div>
+                <button onclick="closeGalleryModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+            </div>
+
+            <!-- FILTER GALERI (TENANT & PENGGUNAAN) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Filter Tenant / Lokasi</label>
+                    <select id="galleryTenantFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="ALL">-- Semua Tenant --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Filter Penggunaan Utility</label>
+                    <select id="galleryTypeFilter" onchange="renderGalleryGrid()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="ALL">-- Semua Utility (Air & Listrik) --</option>
+                        <option value="AIR">💧 Hanya AIR</option>
+                        <option value="LISTRIK">⚡ Hanya LISTRIK</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- GRID GALERI FOTO -->
+            <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="col-span-full py-12 text-center text-xs text-slate-400">Memuat foto dokumentasi...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT DASHBOARD -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
         <!-- MAIN CONTENT LAYOUT: FORM & HISTORY CONTAINER -->
@@ -258,7 +378,7 @@
                                     <span class="text-[11px] font-bold text-slate-700">TTD Teknisi *</span>
                                     <button type="button" id="btnHapusPadTeknisi" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
                                 </div>
-                                <div class="canvas-container"><canvas id="teknisiCanvas"></canvas></div>
+                                <div class="canvas-container"><canvas id="teknisiCanvas" class="sig-pad"></canvas></div>
                                 <input type="text" id="namaTeknisi" required placeholder="Nama Teknisi..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-600 outline-none">
                             </div>
 
@@ -268,7 +388,7 @@
                                     <span class="text-[11px] font-bold text-slate-700">TTD Tenant *</span>
                                     <button type="button" id="btnHapusPadTenant" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
                                 </div>
-                                <div class="canvas-container"><canvas id="tenantCanvas"></canvas></div>
+                                <div class="canvas-container"><canvas id="tenantCanvas" class="sig-pad"></canvas></div>
                                 <input type="text" id="namaPenandatanganTenant" required placeholder="Nama Penandatangan..." class="w-full mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-600 outline-none">
                             </div>
                         </div>
@@ -280,7 +400,7 @@
                 </form>
             </div>
 
-            <!-- HISTORY & LOGS PANEL (COL 5 - DENGAN FILTER PER KATEGORI UTILITY) -->
+            <!-- HISTORY & LOGS PANEL (WITH CATEGORY TABS) -->
             <div class="lg:col-span-5 bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-xl border border-slate-800 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div>
@@ -294,7 +414,7 @@
                     </button>
                 </div>
 
-                <!-- TAB FILTER RIWAYAT PER KATEGORI -->
+                <!-- TAB FILTER RIWAYAT -->
                 <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2" id="historyTabContainer">
                     <button type="button" onclick="filterHistory('ALL')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-indigo-600 text-white">Semua</button>
                     <button type="button" onclick="filterHistory('AIR')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Air Tenant</button>
@@ -363,6 +483,10 @@
     let rawImageFile = null;
     let fotoBase64WithWatermark = '';
 
+    // Chart Instance Variable
+    let myUtilityChart = null;
+    let currentInfographicType = 'AIR';
+
     function cleanName(name) {
         if (!name) return '';
         return String(name).replace(/^\d+[\s\-\.\)]*/, '').trim();
@@ -400,17 +524,7 @@
 
                 const namaValue = getVal(["NAMA TENANT", "NAMA", "TENANT"]);
                 const lokasiValue = getVal(["LOKASI", "NO LOT", "LOT"]);
-                
-                const snValue = getVal([
-                    "SERIAL NUMBER", 
-                    "SERIALNUMBER", 
-                    "SN METER", 
-                    "SN", 
-                    "NO SERIAL", 
-                    "SERIAL NO", 
-                    "S/N"
-                ]);
-                
+                const snValue = getVal(["SERIAL NUMBER", "SERIALNUMBER", "SN METER", "SN", "NO SERIAL", "SERIAL NO", "S/N"]);
                 const zonaValue = getVal(["ZONA", "AREA"]);
 
                 let displayName = cleanName(namaValue);
@@ -639,13 +753,260 @@
                         <span>SN: ${rawSn}</span>
                     </div>
                 </td>
-                <td class="py-3 font-mono font-bold text-indigo-400">${rawAngka}</td>
+                <td class="py-3 font-mono font-bold text-indigo-400">${parseFloat(rawAngka).toLocaleString('id-ID')}</td>
                 <td class="py-3 text-right">
                     <button type="button" onclick="editHistoryItem(${originalIndex})" class="bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white px-2.5 py-1 rounded-lg text-[10px] font-bold border border-amber-500/30 transition">✏️ Edit</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    // ==========================================
+    // LOGIC MODAL INFOGRAFIS (STATUS AIR & LISTRIK)
+    // ==========================================
+    function openInfographicModal(type) {
+        currentInfographicType = type;
+        document.getElementById('statusMenuModal').classList.add('hidden');
+        document.getElementById('infographicModal').classList.remove('hidden');
+
+        const title = document.getElementById('infoModalTitle');
+        const icon = document.getElementById('infoModalIcon');
+        const unitBadge = document.getElementById('unitBadge');
+
+        if (type === 'AIR') {
+            title.innerText = 'Infografis Pemakaian Air';
+            icon.innerText = '💧';
+            icon.className = 'text-2xl p-2 rounded-xl bg-blue-50 text-blue-600';
+            unitBadge.innerText = 'Volume (m³)';
+            unitBadge.className = 'text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full';
+        } else {
+            title.innerText = 'Infografis Pemakaian Listrik';
+            icon.innerText = '⚡';
+            icon.className = 'text-2xl p-2 rounded-xl bg-amber-50 text-amber-600';
+            unitBadge.innerText = 'Daya (kWh)';
+            unitBadge.className = 'text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full';
+        }
+
+        populateTenantInfographicOptions();
+        updateInfographicChart();
+    }
+
+    function closeInfographicModal() {
+        document.getElementById('infographicModal').classList.add('hidden');
+    }
+
+    function populateTenantInfographicOptions() {
+        const select = document.getElementById('infoTenantSelect');
+        select.innerHTML = '<option value="ALL">-- Semua Tenant (Konsumsi Total) --</option>';
+
+        const relevantItems = historyList.filter(item => {
+            const cat = (item["KATEGORI SHEET"] || item.kategoriSheet || "").toUpperCase();
+            return cat.includes(currentInfographicType);
+        });
+
+        const tenantNames = [...new Set(relevantItems.map(item => cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama"))];
+        
+        tenantNames.forEach(tName => {
+            const opt = document.createElement('option');
+            opt.value = tName;
+            opt.innerText = tName;
+            select.appendChild(opt);
+        });
+
+        // HITUNG TERTIAN & TERENDAH BERDASARKAN RATA-RATA / TOTAL PEMAKAIAN
+        const tenantTotals = {};
+        relevantItems.forEach(item => {
+            const tName = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
+            const val = parseFloat(item["ANGKA"] || item.angka || 0);
+            if (!tenantTotals[tName]) tenantTotals[tName] = [];
+            tenantTotals[tName].push(val);
+        });
+
+        let highest = { name: '-', val: -1 };
+        let lowest = { name: '-', val: Infinity };
+
+        Object.keys(tenantTotals).forEach(name => {
+            const vals = tenantTotals[name];
+            const latestVal = vals[vals.length - 1] || 0;
+            
+            if (latestVal > highest.val) {
+                highest = { name: name, val: latestVal };
+            }
+            if (latestVal < lowest.val) {
+                lowest = { name: name, val: latestVal };
+            }
+        });
+
+        document.getElementById('highestTenantName').innerText = highest.name;
+        document.getElementById('highestTenantVal').innerText = highest.val >= 0 ? `${highest.val.toLocaleString('id-ID')} ${currentInfographicType === 'AIR' ? 'm³' : 'kWh'}` : '0';
+
+        document.getElementById('lowestTenantName').innerText = lowest.val !== Infinity ? lowest.name : '-';
+        document.getElementById('lowestTenantVal').innerText = lowest.val !== Infinity ? `${lowest.val.toLocaleString('id-ID')} ${currentInfographicType === 'AIR' ? 'm³' : 'kWh'}` : '0';
+    }
+
+    function updateInfographicChart() {
+        const selectedTenant = document.getElementById('infoTenantSelect').value;
+        let filtered = historyList.filter(item => {
+            const cat = (item["KATEGORI SHEET"] || item.kategoriSheet || "").toUpperCase();
+            return cat.includes(currentInfographicType);
+        });
+
+        if (selectedTenant !== 'ALL') {
+            filtered = filtered.filter(item => {
+                const name = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
+                return name === selectedTenant;
+            });
+        }
+
+        const labels = filtered.map((item, idx) => {
+            const dateStr = item["TIMESTAMP"] || item.timestamp || `Log #${idx+1}`;
+            return dateStr.length > 10 ? dateStr.substring(0, 10) : dateStr;
+        });
+        const dataValues = filtered.map(item => parseFloat(item["ANGKA"] || item.angka || 0));
+
+        // METRIK RINGKASAN
+        document.getElementById('statTotalLog').innerText = filtered.length;
+        if (dataValues.length > 0) {
+            const sum = dataValues.reduce((a, b) => a + b, 0);
+            const avg = sum / dataValues.length;
+            const min = Math.min(...dataValues);
+            const max = Math.max(...dataValues);
+
+            document.getElementById('statAvgStand').innerText = avg.toFixed(1);
+            document.getElementById('statMinStand').innerText = min.toLocaleString('id-ID');
+            document.getElementById('statMaxStand').innerText = max.toLocaleString('id-ID');
+        } else {
+            document.getElementById('statAvgStand').innerText = '0';
+            document.getElementById('statMinStand').innerText = '0';
+            document.getElementById('statMaxStand').innerText = '0';
+        }
+
+        // RENDER / UPDATE CHART.JS
+        const ctx = document.getElementById('utilityChart').getContext('2d');
+        if (myUtilityChart) {
+            myUtilityChart.destroy();
+        }
+
+        const themeColor = currentInfographicType === 'AIR' ? '#2563eb' : '#d97706';
+        const bgColor = currentInfographicType === 'AIR' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(217, 119, 6, 0.15)';
+
+        myUtilityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length > 0 ? labels : ['Belum Ada Data'],
+                datasets: [{
+                    label: `Stand ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`,
+                    data: dataValues.length > 0 ? dataValues : [0],
+                    borderColor: themeColor,
+                    backgroundColor: bgColor,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: themeColor,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: '#f1f5f9' }, beginAtZero: false }
+                }
+            }
+        });
+    }
+
+    // ==========================================
+    // LOGIC MODAL GALERI DOKUMENTASI FOTO METERAN
+    // ==========================================
+    function openGalleryModal() {
+        document.getElementById('statusMenuModal').classList.add('hidden');
+        document.getElementById('galleryModal').classList.remove('hidden');
+
+        // Populate Options Filter Tenant
+        const selectTenant = document.getElementById('galleryTenantFilter');
+        selectTenant.innerHTML = '<option value="ALL">-- Semua Tenant --</option>';
+
+        const tenantNames = [...new Set(historyList.map(item => cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama"))];
+        tenantNames.forEach(tName => {
+            const opt = document.createElement('option');
+            opt.value = tName;
+            opt.innerText = tName;
+            selectTenant.appendChild(opt);
+        });
+
+        renderGalleryGrid();
+    }
+
+    function closeGalleryModal() {
+        document.getElementById('galleryModal').classList.add('hidden');
+    }
+
+    function renderGalleryGrid() {
+        const grid = document.getElementById('galleryGrid');
+        grid.innerHTML = '';
+
+        const tenantFilter = document.getElementById('galleryTenantFilter').value;
+        const typeFilter = document.getElementById('galleryTypeFilter').value;
+
+        let filtered = historyList;
+
+        if (tenantFilter !== 'ALL') {
+            filtered = filtered.filter(item => {
+                const tName = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
+                return tName === tenantFilter;
+            });
+        }
+
+        if (typeFilter !== 'ALL') {
+            filtered = filtered.filter(item => {
+                const cat = (item["KATEGORI SHEET"] || item.kategoriSheet || "").toUpperCase();
+                return cat.includes(typeFilter);
+            });
+        }
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="col-span-full py-12 text-center text-xs text-slate-400">Tidak ada dokumentasi foto meteran yang cocok.</div>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            const fotoUrl = item["FOTO METERAN"] || item["FOTO"] || item.foto || item.fotoMeteran || '';
+            const tenantName = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
+            const kategori = item["KATEGORI SHEET"] || item.kategoriSheet || "-";
+            const angka = item["ANGKA"] || item.angka || "0";
+            const date = item["TIMESTAMP"] || item.timestamp || "Terbaru";
+
+            const card = document.createElement('div');
+            card.className = "bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between";
+            
+            const imageHtml = fotoUrl ? `<img src="${fotoUrl}" alt="Meteran ${tenantName}" class="w-full h-44 object-cover hover:scale-105 transition duration-300">` : `<div class="w-full h-44 bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">Foto Tidak Tersedia</div>`;
+
+            card.innerHTML = `
+                <div class="relative overflow-hidden bg-slate-900">
+                    ${imageHtml}
+                    <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-900/80 text-white backdrop-blur-md">${kategori}</span>
+                </div>
+                <div class="p-3.5 space-y-1">
+                    <div class="font-extrabold text-xs text-slate-800 truncate">${tenantName}</div>
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="text-slate-400">${date.substring(0, 10)}</span>
+                        <span class="font-mono font-bold text-indigo-600">${parseFloat(angka).toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function triggerQuickAction() {
+        document.getElementById('statusMenuModal').classList.add('hidden');
+        document.getElementById('kategoriSheet').focus();
     }
 
     function editHistoryItem(index) {
