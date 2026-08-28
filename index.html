@@ -18,8 +18,8 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen pb-12">
 
-    <!-- TOP NAVIGATION BAR -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <!-- TOP NAVIGATION BAR (STICKY TOP) -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-indigo-200">
@@ -31,90 +31,109 @@
                 </div>
             </div>
 
-            <!-- Top Navigation Tabs (Pill Style) -->
-            <div class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-full text-xs font-bold text-slate-600">
-                <button class="px-4 py-1.5 rounded-full bg-indigo-600 text-white shadow-sm">Dashboard</button>
-                <button class="px-4 py-1.5 rounded-full hover:text-indigo-600 transition">Pencatatan</button>
-                <button class="px-4 py-1.5 rounded-full hover:text-indigo-600 transition">Riwayat Log</button>
-                <button class="px-4 py-1.5 rounded-full hover:text-indigo-600 transition">Laporan</button>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button id="btnRefreshHistoryTop" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition" title="Refresh Data">
+            <div class="flex items-center gap-2">
+                <button id="btnRefreshHistoryTop" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition" title="Refresh Data">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
-                <div class="h-6 w-px bg-slate-200"></div>
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-200">
-                        OP
-                    </div>
-                    <span class="text-xs font-semibold text-slate-700 hidden sm:inline-block">Operator Master</span>
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                <div class="hidden sm:flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-200">OP</div>
+                    <span class="text-xs font-semibold text-slate-700">Operator Master</span>
                 </div>
+
+                <!-- HAMBURGER MENU BUTTON (MOBILE & ALL SCREENS) -->
+                <button id="btnOpenMenu" type="button" class="p-2.5 text-slate-700 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 rounded-xl transition flex items-center justify-center border border-slate-200 ml-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
-
-        <!-- METRIC CARDS OVERVIEW (Finnova Style) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Card 1 -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col justify-between">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Air</span>
-                        <h3 class="text-2xl font-black text-slate-900 mt-1">Tenant & Eateria</h3>
+    <!-- SLIDE-OVER MODAL STATUS MENU (PEMANGGIL GARIS 3) -->
+    <div id="statusMenuModal" class="fixed inset-0 z-50 hidden">
+        <div id="statusMenuBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl p-6 overflow-y-auto space-y-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">📊</span>
+                            <h2 class="text-lg font-bold text-slate-900">Status Utility & Info</h2>
+                        </div>
+                        <button id="btnCloseMenu" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold">✕</button>
                     </div>
-                    <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">💧</span>
-                </div>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50 text-xs">
-                    <span class="text-emerald-600 font-bold flex items-center gap-1">↑ Active</span>
-                    <span class="text-slate-400">Master Updated</span>
-                </div>
-            </div>
 
-            <!-- Card 2 -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Listrik</span>
-                        <h3 class="text-2xl font-black text-slate-900 mt-1">3 Kategori</h3>
-                    </div>
-                    <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">⚡</span>
-                </div>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50 text-xs">
-                    <span class="text-indigo-600 font-bold">Tenant/Eateria/Storage</span>
-                    <span class="text-slate-400">Ready</span>
-                </div>
-            </div>
+                    <!-- METRIC CARDS OVERVIEW (DITAMPILKAN DI DALAM GARIS 3) -->
+                    <div class="space-y-4">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Air</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">Tenant & Eateria</h3>
+                                </div>
+                                <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">💧</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
+                                <span class="text-emerald-600 font-bold">↑ Active</span>
+                                <span class="text-slate-400">Master Updated</span>
+                            </div>
+                        </div>
 
-            <!-- Card 3 -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sistem Validasi</span>
-                        <h3 class="text-2xl font-black text-slate-900 mt-1">Watermark</h3>
-                    </div>
-                    <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">📷</span>
-                </div>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50 text-xs">
-                    <span class="text-emerald-600 font-bold">Auto Timestamp</span>
-                    <span class="text-slate-400">Active</span>
-                </div>
-            </div>
+                        <!-- Card 2 -->
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Listrik</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">3 Kategori</h3>
+                                </div>
+                                <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">⚡</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
+                                <span class="text-indigo-600 font-bold">Tenant/Eateria/Storage</span>
+                                <span class="text-slate-400">Ready</span>
+                            </div>
+                        </div>
 
-            <!-- Card 4 (Highlight Banner Instant Action) -->
-            <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 rounded-2xl text-white shadow-lg shadow-indigo-200 flex flex-col justify-between">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Quick Action</span>
-                        <h3 class="text-lg font-bold text-white mt-1">Input Meteran Baru</h3>
+                        <!-- Card 3 -->
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sistem Validasi</span>
+                                    <h3 class="text-xl font-black text-slate-900 mt-0.5">Watermark</h3>
+                                </div>
+                                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">📷</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 text-xs">
+                                <span class="text-emerald-600 font-bold">Auto Timestamp</span>
+                                <span class="text-slate-400">Active</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 (Quick Action) -->
+                        <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-5 rounded-2xl text-white shadow-lg flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Quick Action</span>
+                                    <h3 class="text-lg font-bold text-white mt-1">Input Meteran Baru</h3>
+                                </div>
+                                <button onclick="document.getElementById('statusMenuModal').classList.add('hidden'); document.getElementById('kategoriSheet').focus()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white transition">↗</button>
+                            </div>
+                            <p class="text-xs text-indigo-100/80 mt-2">Pilih kategori di bawah untuk memulai pencatatan hari ini.</p>
+                        </div>
                     </div>
-                    <button onclick="document.getElementById('kategoriSheet').focus()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white transition">↗</button>
                 </div>
-                <p class="text-xs text-indigo-100/80 mt-2">Pilih kategori di bawah untuk memulai pencatatan hari ini.</p>
+
+                <div class="text-center pt-4 border-t border-slate-100 text-xs text-slate-400">
+                    LOGSET Management System &copy; 2026
+                </div>
             </div>
         </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
         <!-- MAIN CONTENT LAYOUT: FORM & HISTORY CONTAINER -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -261,7 +280,7 @@
                 </form>
             </div>
 
-            <!-- HISTORY & LOGS PANEL (COL 5 - Dark Modern Style) -->
+            <!-- HISTORY & LOGS PANEL (COL 5 - DENGAN FILTER PER KATEGORI UTILITY) -->
             <div class="lg:col-span-5 bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-xl border border-slate-800 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div>
@@ -273,6 +292,16 @@
                     <button id="btnRefreshHistory" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition flex items-center gap-1">
                         🔄 Sync
                     </button>
+                </div>
+
+                <!-- TAB FILTER RIWAYAT PER KATEGORI -->
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2" id="historyTabContainer">
+                    <button type="button" onclick="filterHistory('ALL')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-indigo-600 text-white">Semua</button>
+                    <button type="button" onclick="filterHistory('AIR')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Air Tenant</button>
+                    <button type="button" onclick="filterHistory('AIR EATERIA')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Air Eateria</button>
+                    <button type="button" onclick="filterHistory('LISTRIK TENANT')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Listrik Tenant</button>
+                    <button type="button" onclick="filterHistory('LISTRIK EATERIA')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Listrik Eateria</button>
+                    <button type="button" onclick="filterHistory('LISTRIK STORAGE')" class="history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700">Listrik Storage</button>
                 </div>
 
                 <!-- TABLE CONTAINER -->
@@ -327,6 +356,7 @@
     let rawMasterTenants = [];
     let groupedTenants = {}; 
     let historyList = [];
+    let currentHistoryCategory = 'ALL';
     let selectedTenantGroup = null;
     let padTeknisi, padTenant;
 
@@ -555,42 +585,67 @@
             const res = await fetch(`${SCRIPT_URL}?action=GET_HISTORY`);
             const jsonRes = await res.json();
             historyList = jsonRes.data || [];
-
-            tbody.innerHTML = '';
-            if (historyList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-500">Belum ada riwayat tersimpan.</td></tr>`;
-                return;
-            }
-
-            historyList.forEach((item, index) => {
-                const rawNama = item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant || "";
-                const rawKategori = item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "-";
-                const rawLot = item["NO LOT"] || item["No Lot"] || item.noLot || "-";
-                const rawSn = item["SERIAL NUMBER"] || item["SN"] || item.serialNumber || "-";
-                const rawAngka = item["ANGKA"] || item["Angka"] || item.angka || "0";
-
-                const cleanNamaDisplay = cleanName(rawNama) || rawLot || "Tanpa Nama";
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 transition';
-                tr.innerHTML = `
-                    <td class="py-3">
-                        <div class="font-bold text-white">${cleanNamaDisplay}</div>
-                        <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
-                            <span class="bg-indigo-950 text-indigo-300 px-1.5 py-0.5 rounded font-bold border border-indigo-800/50">${rawKategori}</span>
-                            <span>SN: ${rawSn}</span>
-                        </div>
-                    </td>
-                    <td class="py-3 font-mono font-bold text-indigo-400">${rawAngka}</td>
-                    <td class="py-3 text-right">
-                        <button type="button" onclick="editHistoryItem(${index})" class="bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white px-2.5 py-1 rounded-lg text-[10px] font-bold border border-amber-500/30 transition">✏️ Edit</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            renderHistoryTable();
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-rose-400">Gagal sinkronisasi data riwayat.</td></tr>`;
         }
+    }
+
+    function filterHistory(category) {
+        currentHistoryCategory = category;
+        const buttons = document.querySelectorAll('.history-tab');
+        buttons.forEach(btn => {
+            btn.className = 'history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-slate-800 text-slate-400 hover:bg-slate-700';
+        });
+        
+        event.target.className = 'history-tab px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-indigo-600 text-white';
+        renderHistoryTable();
+    }
+
+    function renderHistoryTable() {
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = '';
+
+        let filteredList = historyList;
+        if (currentHistoryCategory !== 'ALL') {
+            filteredList = historyList.filter(item => {
+                const cat = (item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "").toUpperCase();
+                return cat === currentHistoryCategory.toUpperCase();
+            });
+        }
+
+        if (filteredList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-500">Belum ada riwayat untuk kategori ini.</td></tr>`;
+            return;
+        }
+
+        filteredList.forEach((item, index) => {
+            const rawNama = item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant || "";
+            const rawKategori = item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "-";
+            const rawLot = item["NO LOT"] || item["No Lot"] || item.noLot || "-";
+            const rawSn = item["SERIAL NUMBER"] || item["SN"] || item.serialNumber || "-";
+            const rawAngka = item["ANGKA"] || item["Angka"] || item.angka || "0";
+
+            const cleanNamaDisplay = cleanName(rawNama) || rawLot || "Tanpa Nama";
+            const originalIndex = historyList.indexOf(item);
+
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 transition';
+            tr.innerHTML = `
+                <td class="py-3">
+                    <div class="font-bold text-white">${cleanNamaDisplay}</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <span class="bg-indigo-950 text-indigo-300 px-1.5 py-0.5 rounded font-bold border border-indigo-800/50">${rawKategori}</span>
+                        <span>SN: ${rawSn}</span>
+                    </div>
+                </td>
+                <td class="py-3 font-mono font-bold text-indigo-400">${rawAngka}</td>
+                <td class="py-3 text-right">
+                    <button type="button" onclick="editHistoryItem(${originalIndex})" class="bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white px-2.5 py-1 rounded-lg text-[10px] font-bold border border-amber-500/30 transition">✏️ Edit</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
     function editHistoryItem(index) {
@@ -649,6 +704,12 @@
     window.addEventListener('DOMContentLoaded', () => {
         fetchHistory();
 
+        // DRAWER GARIS 3 HANDLERS
+        const modalMenu = document.getElementById('statusMenuModal');
+        document.getElementById('btnOpenMenu').onclick = () => modalMenu.classList.remove('hidden');
+        document.getElementById('btnCloseMenu').onclick = () => modalMenu.classList.add('hidden');
+        document.getElementById('statusMenuBackdrop').onclick = () => modalMenu.classList.add('hidden');
+
         document.getElementById('btnRefreshHistory').onclick = fetchHistory;
         document.getElementById('btnRefreshHistoryTop').onclick = fetchHistory;
         document.getElementById('btnCancelEdit').onclick = cancelEditMode;
@@ -706,7 +767,6 @@
         document.getElementById('btnHapusPadTenant').onclick = () => padTenant.clear();
     });
 
-    // IMPLEMENTASI LOGIKA FORM SUBMIT SESUAI REQUEST TERBARU
     document.getElementById('utilityForm').onsubmit = async function(e) {
         e.preventDefault();
 
@@ -747,7 +807,6 @@
                 body: JSON.stringify(payload)
             });
             
-            // TAMPILKAN POPUP TERIMA KASIH DENGAN FOTO RICO
             showThankYouModal();
             fetchHistory();
         } catch (err) {
