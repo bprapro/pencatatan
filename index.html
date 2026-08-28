@@ -859,73 +859,90 @@
     function updateInfographicChart() {
         const selectedTenant = document.getElementById('infoTenantSelect').value;
         
-        // 1. Filter riwayat berdasarkan kategori utility aktif (AIR / LISTRIK)
-        let filtered = historyList.filter(item => {
+        // 1. Filter log berdasarkan kategori aktif (AIR / LISTRIK)
+        let rawFiltered = historyList.filter(item => {
             const cat = String(item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "").toUpperCase();
             return cat.includes(currentInfographicType.toUpperCase());
         });
 
-        // 2. Filter tenant jika spesifik
-        if (selectedTenant !== 'ALL') {
-            filtered = filtered.filter(item => {
-                const name = cleanName(item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant) || item["NO LOT"] || item["No Lot"] || "Tanpa Nama";
-                return name === selectedTenant;
-            });
-        }
+        // 2. KELOMPOKKAN & URUTKAN DATA PER TENANT UNTUK HITUNG SELISIH (DELTA)
+        // Map structure: { "NAMA_TENANT": [ { dateKey, timestamp, angka }, ... ] }
+        const tenantGrouped = {};
 
-        // 3. AGREGASI DATA PER TANGGAL (Fix Parse Format Tanggal Google Sheets "M/D/YYYY HH:mm")
-        const aggregatedMap = {};
+        rawFiltered.forEach(item => {
+            const tenantName = cleanName(item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant) || item["NO LOT"] || item["No Lot"] || "Tanpa Nama";
+            const rawTs = String(item["TIMESTAMP"] || item["Timestamp"] || item.timestamp || "").trim();
+            const val = parseFloat(item["ANGKA"] || item["Angka"] || item.angka || 0);
 
-        filtered.forEach(item => {
-            const rawTimestamp = String(item["TIMESTAMP"] || item["Timestamp"] || item.timestamp || "").trim();
+            // Parsing Tanggal YYYY-MM-DD
             let dateKey = 'Tanpa Tanggal';
-
-            if (rawTimestamp) {
-                // Ambil bagian tanggalnya saja (sebelum spasi jam)
-                const datePart = rawTimestamp.split(' ')[0]; // Contoh: "8/27/2026"
-                const dateComponents = datePart.split('/'); // Split [bulan, tanggal, tahun]
-
+            if (rawTs) {
+                const datePart = rawTs.split(' ')[0].split('T')[0];
+                const dateComponents = datePart.split('/');
                 if (dateComponents.length === 3) {
                     const month = dateComponents[0].padStart(2, '0');
                     const day = dateComponents[1].padStart(2, '0');
                     const year = dateComponents[2];
-                    // Format standar ISO: YYYY-MM-DD
                     dateKey = `${year}-${month}-${day}`;
                 } else {
                     dateKey = datePart;
                 }
             }
 
-            // Ambil angka dari Kolom H (ANGKA)
-            const val = parseFloat(item["ANGKA"] || item["Angka"] || item.angka || 0);
-
-            if (!aggregatedMap[dateKey]) {
-                aggregatedMap[dateKey] = {
-                    total: 0,
-                    count: 0,
-                    latestVal: val
-                };
-            }
-
-            aggregatedMap[dateKey].total += val;
-            aggregatedMap[dateKey].count += 1;
-            aggregatedMap[dateKey].latestVal = val; 
+            if (!tenantGrouped[tenantName]) tenantGrouped[tenantName] = [];
+            tenantGrouped[tenantName].push({
+                dateKey: dateKey,
+                rawTime: new Date(rawTs).getTime() || 0,
+                angka: val
+            });
         });
 
-        // Urutkan tanggal secara kronologis (Sumbu X)
-        const sortedDates = Object.keys(aggregatedMap).sort();
+        // 3. HITUNG SELISIH (DELTA) PEMAKAIAN PER TENANT
+        // Array penampung semua record yang sudah ada nilai 'pemakaian'-nya
+        let calculatedLogs = [];
 
+        Object.keys(tenantGrouped).forEach(tName => {
+            // Urutkan riwayat tenant berdasarkan waktu lama -> baru
+            tenantGrouped[tName].sort((a, b) => a.rawTime - b.rawTime);
+
+            let prevStand = null;
+            tenantGrouped[tName].forEach(rec => {
+                let delta = 0;
+                if (prevStand !== null) {
+                    // Selisih = Stand Sekarang - Stand Awal/Sebelumnya
+                    delta = rec.angka - prevStand;
+                    if (delta < 0) delta = 0; // Guard jika meteran diganti/reset
+                }
+                prevStand = rec.angka; // Update stand awal untuk pencatatan berikutnya
+
+                calculatedLogs.push({
+                    tenant: tName,
+                    dateKey: rec.dateKey,
+                    pemakaian: delta
+                });
+            });
+        });
+
+        // 4. FILTER TENANT & AGREGASI KE SUMBU X (TANGGAL)
+        let displayLogs = calculatedLogs;
+        if (selectedTenant !== 'ALL') {
+            displayLogs = calculatedLogs.filter(item => item.tenant === selectedTenant);
+        }
+
+        const dateMap = {};
+        displayLogs.forEach(item => {
+            if (!dateMap[item.dateKey]) dateMap[item.dateKey] = 0;
+            // Jika ALL -> Total selisih semua tenant di tanggal tsb
+            // Jika 1 Tenant -> Total selisih tenant tsb di tanggal tsb
+            dateMap[item.dateKey] += item.pemakaian;
+        });
+
+        const sortedDates = Object.keys(dateMap).sort();
         const labels = sortedDates;
-        const dataValues = sortedDates.map(dateKey => {
-            if (selectedTenant === 'ALL') {
-                return aggregatedMap[dateKey].total;
-            } else {
-                return aggregatedMap[dateKey].latestVal;
-            }
-        });
+        const dataValues = sortedDates.map(d => dateMap[d]);
 
-        // 4. Update Ringkasan Statis di Bawah
-        document.getElementById('statTotalLog').innerText = filtered.length;
+        // 5. UPDATE RINGKASAN STATISTIK (Bawah)
+        document.getElementById('statTotalLog').innerText = displayLogs.length;
         if (dataValues.length > 0) {
             const sum = dataValues.reduce((a, b) => a + b, 0);
             const avg = sum / dataValues.length;
@@ -941,7 +958,7 @@
             document.getElementById('statMaxStand').innerText = '0';
         }
 
-        // 5. Render ulang Chart.js
+        // 6. RENDER KEMBALI CHART
         const ctx = document.getElementById('utilityChart').getContext('2d');
         if (myUtilityChart) {
             myUtilityChart.destroy();
@@ -953,8 +970,8 @@
                 labels: labels.length > 0 ? labels : ['Belum Ada Data'],
                 datasets: [{
                     label: selectedTenant === 'ALL' 
-                        ? `Total Konsumsi ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`
-                        : `Stand ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`,
+                        ? `Total Pemakaian ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`
+                        : `Pemakaian ${currentInfographicType === 'AIR' ? 'Air (m³)' : 'Listrik (kWh)'}`,
                     data: dataValues.length > 0 ? dataValues : [0],
                     borderColor: '#4f46e5',
                     backgroundColor: 'rgba(79, 70, 229, 0.08)',
@@ -974,7 +991,7 @@
                         callbacks: {
                             label: function(context) {
                                 let unit = currentInfographicType === 'AIR' ? 'm³' : 'kWh';
-                                return ` ${context.parsed.y.toLocaleString('id-ID')} ${unit}`;
+                                return ` Pemakaian: ${context.parsed.y.toLocaleString('id-ID')} ${unit}`;
                             }
                         }
                     }
@@ -986,7 +1003,7 @@
                     },
                     y: { 
                         grid: { color: '#f1f5f9' }, 
-                        beginAtZero: false 
+                        beginAtZero: true 
                     }
                 }
             }
