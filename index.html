@@ -861,11 +861,11 @@
         
         // 1. Filter riwayat berdasarkan kategori utility aktif (AIR / LISTRIK)
         let filtered = historyList.filter(item => {
-            const cat = (item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "").toUpperCase();
-            return cat.includes(currentInfographicType);
+            const cat = String(item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "").toUpperCase();
+            return cat.includes(currentInfographicType.toUpperCase());
         });
 
-        // 2. Jika tenant spesifik dipilih, filter berdasarkan nama tenant
+        // 2. Filter tenant jika spesifik
         if (selectedTenant !== 'ALL') {
             filtered = filtered.filter(item => {
                 const name = cleanName(item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant) || item["NO LOT"] || item["No Lot"] || "Tanpa Nama";
@@ -873,13 +873,30 @@
             });
         }
 
-        // 3. AGREGASI DATA PER TANGGAL (Pembersihan Duplikasi Sumbu X)
+        // 3. AGREGASI DATA PER TANGGAL (Fix Parse Format Tanggal Google Sheets "M/D/YYYY HH:mm")
         const aggregatedMap = {};
 
         filtered.forEach(item => {
-            const rawDate = item["TIMESTAMP"] || item["Timestamp"] || item.timestamp || "";
-            // Ambil format YYYY-MM-DD
-            const dateKey = rawDate.length >= 10 ? rawDate.substring(0, 10) : (rawDate || 'Tanpa Tanggal');
+            const rawTimestamp = String(item["TIMESTAMP"] || item["Timestamp"] || item.timestamp || "").trim();
+            let dateKey = 'Tanpa Tanggal';
+
+            if (rawTimestamp) {
+                // Ambil bagian tanggalnya saja (sebelum spasi jam)
+                const datePart = rawTimestamp.split(' ')[0]; // Contoh: "8/27/2026"
+                const dateComponents = datePart.split('/'); // Split [bulan, tanggal, tahun]
+
+                if (dateComponents.length === 3) {
+                    const month = dateComponents[0].padStart(2, '0');
+                    const day = dateComponents[1].padStart(2, '0');
+                    const year = dateComponents[2];
+                    // Format standar ISO: YYYY-MM-DD
+                    dateKey = `${year}-${month}-${day}`;
+                } else {
+                    dateKey = datePart;
+                }
+            }
+
+            // Ambil angka dari Kolom H (ANGKA)
             const val = parseFloat(item["ANGKA"] || item["Angka"] || item.angka || 0);
 
             if (!aggregatedMap[dateKey]) {
@@ -890,22 +907,20 @@
                 };
             }
 
-            // Jika "Semua Tenant", jumlahkan total per tanggal
-            // Jika "Tenant Spesifik", catat nilai pemakaian per tanggal
             aggregatedMap[dateKey].total += val;
             aggregatedMap[dateKey].count += 1;
             aggregatedMap[dateKey].latestVal = val; 
         });
 
         // Urutkan tanggal secara kronologis (Sumbu X)
-        const sortedDates = Object.keys(aggregatedMap).sort((a, b) => new Date(a) - new Date(b));
+        const sortedDates = Object.keys(aggregatedMap).sort();
 
         const labels = sortedDates;
         const dataValues = sortedDates.map(dateKey => {
             if (selectedTenant === 'ALL') {
-                return aggregatedMap[dateKey].total; // Total gabungan seluruh tenant di tanggal tsb
+                return aggregatedMap[dateKey].total;
             } else {
-                return aggregatedMap[dateKey].latestVal; // Nilai stand tenant tsb di tanggal tsb
+                return aggregatedMap[dateKey].latestVal;
             }
         });
 
