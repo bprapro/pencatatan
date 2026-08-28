@@ -865,8 +865,7 @@
             return cat.includes(currentInfographicType.toUpperCase());
         });
 
-        // 2. KELOMPOKKAN & URUTKAN DATA PER TENANT UNTUK HITUNG SELISIH (DELTA)
-        // Map structure: { "NAMA_TENANT": [ { dateKey, timestamp, angka }, ... ] }
+        // 2. KELOMPOKKAN PER TENANT
         const tenantGrouped = {};
 
         rawFiltered.forEach(item => {
@@ -890,30 +889,36 @@
             }
 
             if (!tenantGrouped[tenantName]) tenantGrouped[tenantName] = [];
+            
+            // Konversi timestamp untuk pengurutan kronologis
+            let timeNum = 0;
+            if (rawTs) {
+                const parsedDate = new Date(rawTs);
+                timeNum = isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+            }
+
             tenantGrouped[tenantName].push({
                 dateKey: dateKey,
-                rawTime: new Date(rawTs).getTime() || 0,
+                rawTime: timeNum,
                 angka: val
             });
         });
 
-        // 3. HITUNG SELISIH (DELTA) PEMAKAIAN PER TENANT
-        // Array penampung semua record yang sudah ada nilai 'pemakaian'-nya
+        // 3. HITUNG PEMAKAIAN (PENCATATAN PERTAMA DIANGGAP SELISIH DARI 0)
         let calculatedLogs = [];
 
         Object.keys(tenantGrouped).forEach(tName => {
-            // Urutkan riwayat tenant berdasarkan waktu lama -> baru
+            // Urutkan dari pencatatan paling lama ke paling baru
             tenantGrouped[tName].sort((a, b) => a.rawTime - b.rawTime);
 
-            let prevStand = null;
+            let prevStand = 0; // Jika pencatatan pertama, acuan awal dianggap 0
+
             tenantGrouped[tName].forEach(rec => {
-                let delta = 0;
-                if (prevStand !== null) {
-                    // Selisih = Stand Sekarang - Stand Awal/Sebelumnya
-                    delta = rec.angka - prevStand;
-                    if (delta < 0) delta = 0; // Guard jika meteran diganti/reset
-                }
-                prevStand = rec.angka; // Update stand awal untuk pencatatan berikutnya
+                // Selisih = Stand Sekarang - Stand Sebelumnya (Stand Awal = 0)
+                let delta = rec.angka - prevStand;
+                if (delta < 0) delta = rec.angka; // Guard jika reset/ganti meteran
+
+                prevStand = rec.angka; // Update acuan untuk pencatatan berikutnya
 
                 calculatedLogs.push({
                     tenant: tName,
@@ -923,7 +928,7 @@
             });
         });
 
-        // 4. FILTER TENANT & AGREGASI KE SUMBU X (TANGGAL)
+        // 4. FILTER BASED ON TENANT SELECTION & AGREGASI PER TANGGAL
         let displayLogs = calculatedLogs;
         if (selectedTenant !== 'ALL') {
             displayLogs = calculatedLogs.filter(item => item.tenant === selectedTenant);
@@ -932,8 +937,6 @@
         const dateMap = {};
         displayLogs.forEach(item => {
             if (!dateMap[item.dateKey]) dateMap[item.dateKey] = 0;
-            // Jika ALL -> Total selisih semua tenant di tanggal tsb
-            // Jika 1 Tenant -> Total selisih tenant tsb di tanggal tsb
             dateMap[item.dateKey] += item.pemakaian;
         });
 
@@ -941,7 +944,7 @@
         const labels = sortedDates;
         const dataValues = sortedDates.map(d => dateMap[d]);
 
-        // 5. UPDATE RINGKASAN STATISTIK (Bawah)
+        // 5. UPDATE RINGKASAN STATISTIK DIBUAT DENGAN ANGKA DESIMAL YANG RAPI
         document.getElementById('statTotalLog').innerText = displayLogs.length;
         if (dataValues.length > 0) {
             const sum = dataValues.reduce((a, b) => a + b, 0);
@@ -949,9 +952,9 @@
             const min = Math.min(...dataValues);
             const max = Math.max(...dataValues);
 
-            document.getElementById('statAvgStand').innerText = avg.toFixed(1);
-            document.getElementById('statMinStand').innerText = min.toLocaleString('id-ID');
-            document.getElementById('statMaxStand').innerText = max.toLocaleString('id-ID');
+            document.getElementById('statAvgStand').innerText = avg.toLocaleString('id-ID', { maximumFractionDigits: 1 });
+            document.getElementById('statMinStand').innerText = min.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+            document.getElementById('statMaxStand').innerText = max.toLocaleString('id-ID', { maximumFractionDigits: 2 });
         } else {
             document.getElementById('statAvgStand').innerText = '0';
             document.getElementById('statMinStand').innerText = '0';
