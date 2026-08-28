@@ -947,6 +947,25 @@
         document.getElementById('galleryModal').classList.add('hidden');
     }
 
+    // Sertakan fungsi pembantu ini tepat di atas renderGalleryGrid
+    function getDirectImageUrl(url) {
+        if (!url) return '';
+        let cleanUrl = String(url).trim();
+        
+        if (cleanUrl.startsWith('data:image')) return cleanUrl;
+
+        let fileId = '';
+        const driveMatch = cleanUrl.match(/\/file\/d\/([^\/]+)/) || cleanUrl.match(/[?&]id=([^&]+)/);
+        
+        if (driveMatch && driveMatch[1]) {
+            fileId = driveMatch[1];
+            return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+        }
+
+        return cleanUrl;
+    }
+
+    // Ganti fungsi renderGalleryGrid lama dari baris 950 dengan ini:
     function renderGalleryGrid() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '';
@@ -958,14 +977,14 @@
 
         if (tenantFilter !== 'ALL') {
             filtered = filtered.filter(item => {
-                const tName = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
+                const tName = cleanName(item["NAMA TENANT"] || item["Nama Tenant"] || item.namaTenant) || item["NO LOT"] || item["No Lot"] || "Tanpa Nama";
                 return tName === tenantFilter;
             });
         }
 
         if (typeFilter !== 'ALL') {
             filtered = filtered.filter(item => {
-                const cat = (item["KATEGORI SHEET"] || item.kategoriSheet || "").toUpperCase();
+                const cat = (item["KATEGORI SHEET"] || item["Kategori Sheet"] || item.kategoriSheet || "").toUpperCase();
                 return cat.includes(typeFilter);
             });
         }
@@ -976,16 +995,27 @@
         }
 
         filtered.forEach(item => {
-            const fotoUrl = item["FOTO METERAN"] || item["FOTO"] || item.foto || item.fotoMeteran || '';
-            const tenantName = cleanName(item["NAMA TENANT"] || item.namaTenant) || item["NO LOT"] || "Tanpa Nama";
-            const kategori = item["KATEGORI SHEET"] || item.kategoriSheet || "-";
-            const angka = item["ANGKA"] || item.angka || "0";
-            const date = item["TIMESTAMP"] || item.timestamp || "Terbaru";
+            const getVal = (targetKeys) => {
+                const foundKey = Object.keys(item).find(k => 
+                    targetKeys.includes(k.trim().toUpperCase())
+                );
+                return foundKey ? item[foundKey] : "";
+            };
+
+            const rawFotoUrl = getVal(["FOTO METERAN", "FOTO", "LINK FOTO", "IMAGE", "FOTOMETERAN"]);
+            const fotoUrl = getDirectImageUrl(rawFotoUrl);
+            
+            const tenantName = cleanName(getVal(["NAMA TENANT", "NAMA", "TENANT"])) || getVal(["NO LOT", "LOT"]) || "Tanpa Nama";
+            const kategori = getVal(["KATEGORI SHEET", "KATEGORI"]) || "-";
+            const angka = getVal(["ANGKA", "STAND"]) || "0";
+            const date = getVal(["TIMESTAMP", "TANGGAL"]) || "Terbaru";
 
             const card = document.createElement('div');
             card.className = "bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between";
             
-            const imageHtml = fotoUrl ? `<img src="${fotoUrl}" alt="Meteran ${tenantName}" class="w-full h-44 object-cover hover:scale-105 transition duration-300">` : `<div class="w-full h-44 bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">Foto Tidak Tersedia</div>`;
+            const imageHtml = fotoUrl ? 
+                `<img src="${fotoUrl}" alt="Meteran ${tenantName}" referrerpolicy="no-referrer" class="w-full h-44 object-cover hover:scale-105 transition duration-300" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-44 bg-slate-200 flex flex-col items-center justify-center text-slate-400 text-xs font-semibold p-2 text-center\'><span>⚠️ Gagal Memuat Foto</span><span class=\'text-[10px] opacity-75 mt-1\'>Izin akses Google Drive belum Publik</span></div>';">` : 
+                `<div class="w-full h-44 bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">Foto Tidak Tersedia</div>`;
 
             card.innerHTML = `
                 <div class="relative overflow-hidden bg-slate-900">
@@ -995,8 +1025,8 @@
                 <div class="p-3.5 space-y-1">
                     <div class="font-extrabold text-xs text-slate-800 truncate">${tenantName}</div>
                     <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-400">${date.substring(0, 10)}</span>
-                        <span class="font-mono font-bold text-indigo-600">${parseFloat(angka).toLocaleString('id-ID')}</span>
+                        <span class="text-slate-400">${String(date).substring(0, 10)}</span>
+                        <span class="font-mono font-bold text-indigo-600">${parseFloat(angka || 0).toLocaleString('id-ID')}</span>
                     </div>
                 </div>
             `;
